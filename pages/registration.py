@@ -37,36 +37,30 @@ def checkPassword(password):
         return False, "Please add a number"
     
 def user_exists(email):
-    response = requests.get('http://127.0.0.1:5000/crazy_user/{email}')
-    if response.status_code==200 or response.status_code==201:
-        return response.json().get('exists', False)
-    else:
-        st.error("Failed to check email in database")
-        return True
+    pass
+    # response = requests.get('http://127.0.0.1:5000/crazy_user/{email}')
+    # if response.status_code==200 or response.status_code==201:
+    #     return response.json().get('exists', False)
+    # else:
+    #     st.error("Failed to check email in database")
+    #     return True
 
 
 if st.button('Submit'):
     if checkEmail(email):
-        response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
-        if response.status_code == 201:
-            st.success('Account Created!')
         isPasswordValid, password_message = checkPassword(password)
-        if not user_exists:
-            if isPasswordValid:
-                response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
-                st.switch_page("pages/app.py")
-                if response.status_code == 201:
-                    st.success('Account Created!')
-                else:
-                    st.error("Account not created succesfully :(")
+        # if not user_exists:
+        if isPasswordValid:
+            response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+            if response.status_code == 201:
+                st.success('Account Created!')
             else:
-                st.error(password_message)
+                st.error("Account not created succesfully :(")
         else:
-            st.error('Failed to create User account')
-            st.error("Email already registered, please login")
+                st.error(password_message)
+        # else:
+        #     st.error("Email already registered, please login")
     else:
-
-        
         st.error("Invalid email format")
 
 
