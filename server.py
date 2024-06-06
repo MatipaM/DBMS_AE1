@@ -29,7 +29,7 @@ def save():
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Books (title, author, publisher, description, secondary_title, version, year_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)', (title, author, publisher, description, secondary_title, version, year_purchased))
+        cursor.execute('INSERT INTO Books (title, secondary_title, author, publisher, description, version, year_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)', (title, author, publisher, description, secondary_title, version, year_purchased))
         connect.commit()
         cursor.close()
         connect.close()
@@ -37,6 +37,30 @@ def save():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+
+# Borrow Book Function
+
+@app.route('/crazy_borrow', methods=['POST'])
+def borrow_book():
+    user_id = request.json.get('user_id')
+    book_title = request.json.get('book_title')
+    date_borrowed = request.json.get('date_borrowed')  
+
+    if not user_id or not book_title or not date_borrowed:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        connect = connection()
+        cursor = connect.cursor()
+        cursor.execute('INSERT INTO Borrow (user_id, Title, Borrowed_Date) VALUES (?, ?, ?)', (user_id, book_title, date_borrowed))
+        connect.commit()
+        cursor.close()
+        connect.close()
+        return jsonify({'message': 'Data saved'}), 201
+    except Error as e:
+        print(e)
+        return jsonify({'error': 'Error saving data'}), 500
+
     
 
 # USER TABLE
