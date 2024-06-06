@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-
+import streamlit_authenticator as stauch
 
 st.title("Registration Page")
 
@@ -13,9 +13,20 @@ email = st.text_input('Enter email:')
 password = st.text_input('Create password:')
 
 
+#forgotten password
+
+def checkEmail(email):
+    hasAt = '@' in email
+    hasDot = '.' in email
+    isValid = hasAt and hasDot and email.index('@') < email.rindex('.')
+    return isValid
+
 if st.button('Submit'):
-    response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
-    if response.status_code == 201:
-        st.success('Account Created!')
+    if checkEmail(email):
+        response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+        if response.status_code == 201:
+            st.success('Account Created!')
+        else:
+            st.error('Failed to create User account')
     else:
-        st.error('Failed to create User account')
+        st.error("Invalid email format")
