@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-st.title("Let's submit some books man!")
+st.title("Let's submit some books for the Librarian!")
 
 title = st.text_area('Enter title:')
 author = st.text_area('Enter Author:')
