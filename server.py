@@ -4,6 +4,7 @@ from sqlite3 import Error
 
 app = Flask(__name__)
 
+
 def connection():
     conn = None
     try:
@@ -42,6 +43,8 @@ def save():
 
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
+    create_user_table()
+    print("I am trying to save the user's information")
     first_name = request.json.get('first_name')
     last_name = request.json.get('last_name')
     profile_picture = request.json.get('profile_picture')
@@ -64,6 +67,30 @@ def save_user():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+
+def create_user_table():
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS User (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
+                profile_picture TEXT,
+                address TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("User table created successfully")
+    except Error as e:
+        print(e)
     
 if __name__ == '__main__':
     app.run(port=5000)
+    
