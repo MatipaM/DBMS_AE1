@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, session
 import sqlite3
 from sqlite3 import Error
+from datetime import datetime
 
 app = Flask(__name__)
-
+app.secret_key = 'secret_key'
 
 def connection():
     conn = None
@@ -115,21 +116,20 @@ def borrow_book():
     book_title = request.json.get('book_title')
     affiliation = request.json.get('affiliation')
     interest = request.json.get('interest')
-    date_borrowed = request.json.get('date_borrowed')  
+    request_date = request.json.get('request_date')
 
-    if not email or not book_title or not date_borrowed:
+    if not email or not book_title or not affiliation or not interest:
         return jsonify({'error': 'No data provided'}), 400
 
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Book_Records (Email, Title, Borrowed_Date) VALUES (?, ?, ?)', (email, book_title, date_borrowed))
-        cursor.execute('INSERT INTO Book_Request_Info (Email, Title, Affiliation, Interest) VALUES (?, ?, ?, ?)', (email, book_title, affiliation, interest))
+        cursor.execute('INSERT INTO Pending_Request (Email, Title, Affiliation, Interest, Request_Date) VALUES (?, ?, ?, ?, ?)', (email, book_title, affiliation, interest, request_date))
         connect.commit()
         cursor.close()
         connect.close()
 
-        session['email'] = email
+        #session['email'] = email
 
         return jsonify({'message': 'Data saved'}), 201
     except Error as e:
@@ -141,21 +141,16 @@ def borrow_book():
 
 @app.route('/crazy_libreview', methods=['GET'])
 def lib_review():
-    if 'email' not in session:
-        return jsonify({'message': 'No previous record of borrowing book'}), 200
-
-    email = session['email']
     try:
         connect = connection()
-        cursor = connect.cursor()
-        cursor.execute("""
-                SELECT COUNT(*) FROM Book_Records 
-                WHERE Email = ? AND Borrowed_Date IS NOT NULL AND Returned_Date IS NULL
-            """, (email,))
-        unreturned_books = cursor.fetchone()[0]
+        cursor = connect.cursor() 
+        cursor.execute("SELECT * FROM Pending_Request")
+        rows = cursor.fetchall()
+        columns = [description[0] for description in cursor.description]
+        data = [dict(zip(columns, row)) for row in rows]
         cursor.close()
         connect.close()
-        return jsonify({'message': unreturned_books}), 200
+        return data, 200
     except Error as e:
         print(e)
         return jsonify({'error': 'Error retrieving data'}), 500
