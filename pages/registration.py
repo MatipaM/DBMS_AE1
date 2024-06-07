@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from string import punctuation
+import server
+import sqlite3
 
 
 st.title("Registration Page")
@@ -37,29 +39,40 @@ def checkPassword(password):
         return False, "Please add a number"
     
 def user_exists(email):
-    pass
-    # response = requests.get('http://127.0.0.1:5000/crazy_user/{email}')
-    # if response.status_code==200 or response.status_code==201:
-    #     return response.json().get('exists', False)
-    # else:
-    #     st.error("Failed to check email in database")
-    #     return True
+    try:
+        connect = server.connection()
+        cursor = connect.cursor()
+        query = 'SELECT email FROM User where email=?'
+        cursor.execute(query, (email,))
+        emails = cursor.fetchone()
+        cursor.close()
+        connect.close()
+
+        if emails is not None:
+            return True, emails
+        else:
+            return False, "should add user"
+    except sqlite3.Error as e:
+        print(e.errno())
+        return False, "error"
 
 
 if st.button('Submit'):
+    
     if checkEmail(email):
         isPasswordValid, password_message = checkPassword(password)
-        # if not user_exists:
-        if isPasswordValid:
-            response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
-            if response.status_code == 201:
-                st.success('Account Created!')
+        userExists, email_message = user_exists(email)
+        if not userExists:
+            if isPasswordValid:
+                response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                if response.status_code == 201:
+                    st.success('Account Created!')
+                else:
+                    st.error("Account not created succesfully :(")
             else:
-                st.error("Account not created succesfully :(")
+                    st.error(password_message)
         else:
-                st.error(password_message)
-        # else:
-        #     st.error("Email already registered, please login")
+            st.error(f"{email_message} already registered, please login")
     else:
         st.error("Invalid email format")
 
