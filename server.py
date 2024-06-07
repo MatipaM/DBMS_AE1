@@ -4,7 +4,6 @@ from sqlite3 import Error
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
 
 def connection():
     conn = None
@@ -135,25 +134,6 @@ def borrow_book():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
-
-# Librarian Book Request Review
-# 3 conditions: Returned all books, paid outstanding bills, and current student
-
-@app.route('/crazy_libreview', methods=['GET'])
-def lib_review():
-    try:
-        connect = connection()
-        cursor = connect.cursor() 
-        cursor.execute("SELECT * FROM Pending_Request")
-        rows = cursor.fetchall()
-        columns = [description[0] for description in cursor.description]
-        data = [dict(zip(columns, row)) for row in rows]
-        cursor.close()
-        connect.close()
-        return data, 200
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error retrieving data'}), 500
    
 if __name__ == '__main__':
     app.run(port=5000)    
