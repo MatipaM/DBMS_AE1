@@ -60,7 +60,6 @@ def create_user_table():
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
     create_user_table()
-    print("I am trying to save the user's information")
     first_name = request.json.get('first_name')
     last_name = request.json.get('last_name')
     profile_picture = request.json.get('profile_picture')
