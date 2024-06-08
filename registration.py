@@ -3,7 +3,7 @@ import requests
 from string import punctuation
 import server
 import sqlite3
-import phonenumbers
+#import phonenumbers
 
 
 st.title("Registration Page")
@@ -16,7 +16,7 @@ street = st.text_area('Enter Street:')
 city = st.text_area('Enter City:')
 postal_code = st.text_area('Enter postal code:', max_chars=7)
 country = st.text_area('Enter country:')
-phone = st.text_input('Enter phone number:', max_chars=11, placeholder="01234567891") #can only take UK numbers
+phone = st.text_input('Enter phone number:', value='+44 ', max_chars=11, placeholder="+447588720903") #can only take UK numbers
 email = st.text_input('Enter email:')
 password = st.text_input('Create password:', type='password')
 
