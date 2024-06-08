@@ -11,6 +11,7 @@ st.title("Registration Page")
 first_name = st.text_input('Enter First Name:')
 last_name = st.text_input('Enter Last Name:')
 profile_picture = st.text_area('Upload profile picture:')
+# profile_picture = st.file_uploader('Upload profile picture:')
 street = st.text_area('Enter Street:')
 city = st.text_area('Enter City:')
 postal_code = st.text_area('Enter postal code:', max_chars=7)
@@ -20,7 +21,19 @@ email = st.text_input('Enter email:')
 password = st.text_input('Create password:', type='password')
 
 
-#forgotten password
+def checkEmail():
+    hasAt = '@' in email
+    hasDot = '.' in email
+    isValid = hasAt and hasDot and email.index('@') < email.rindex('.')
+
+    if "@student" in email:
+        return isValid, 'http://127.0.0.1:5000/crazy_student', 'student'
+    elif "@administrator" in email:
+        return isValid, 'http://127.0.0.1:5000/crazy_administrator', 'administrator'
+    elif "@librarian" in email:
+        return isValid, 'http://127.0.0.1:5000/crazy_librarian', 'librarian'
+    else:
+        return isValid, 'http://127.0.0.1:5000/crazy_user', 'user'
 
 #not working
 def checkNames():
@@ -52,12 +65,6 @@ def checkPhoneNumber():
         return False, "Phone number must be a local UK number starting with 0"
     
 
-def checkEmail():
-    hasAt = '@' in email
-    hasDot = '.' in email
-    isValid = hasAt and hasDot and email.index('@') < email.rindex('.')
-    return isValid
-
 def checkPassword():
     specialKey = any(char in punctuation for char in password)
     hasNumbers = any(char.isdigit() for char in password)
@@ -80,11 +87,11 @@ def checkPostal():
     else:
         return False, "Postal code must be between 5 and 7 letters"
     
-def user_exists():
+def user_exists(table_name):
     try:
         connect = server.connection()
         cursor = connect.cursor()
-        query = 'SELECT email FROM User where email=?'
+        query = f'SELECT email FROM {table_name} where email=?'
         cursor.execute(query, (email,))
         emails = cursor.fetchone()
         cursor.close()
@@ -95,16 +102,17 @@ def user_exists():
         else:
             return False, "should add user"
     except sqlite3.Error as e:
-        print(e.errno())
+        print(e)
         return False, "error"
 
 address = f"{street}, {city}, {country}, {postal_code}"
 
 if st.button('Submit'):
     
-    if checkEmail():
+    emailValid, email_route, table_name = checkEmail()
+    if emailValid:
         isPasswordValid, password_message = checkPassword()
-        userExists, email_message = user_exists()
+        userExists, email_message = user_exists(table_name)
         phoneValid, phone_message = checkPhoneNumber()
         namesValid, name_message = checkNames()
         postalValid, postal_message = checkPostal()
@@ -113,7 +121,7 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post('http://127.0.0.1:5000/crazy_user', json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
                             if response.status_code == 201:
                                 st.success('Account Created!')
                             else:
