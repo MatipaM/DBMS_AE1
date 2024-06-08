@@ -32,6 +32,8 @@ def checkEmail():
         return isValid, 'http://127.0.0.1:5000/crazy_administrator', 'administrator'
     elif "@librarian" in email:
         return isValid, 'http://127.0.0.1:5000/crazy_librarian', 'librarian'
+    elif "@staff" in email:
+        return isValid, 'http://127.0.0.1:5000/crazy_staff', 'staff'
     else:
         return isValid, 'http://127.0.0.1:5000/crazy_user', 'user'
 
