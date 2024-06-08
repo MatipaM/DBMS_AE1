@@ -258,6 +258,7 @@ def return_book():
         connect = connection()
         cursor = connect.cursor()
         cursor.execute('UPDATE Book_Records SET Returned_Date = ?, Rating = ?, Review = ? WHERE Email = ? AND Title = ?', (returned_date, rating, review, email, title))
+        cursor.execute('DELETE FROM Books WHERE Title = ?', (title,))
         connect.commit()
         cursor.close()
         connect.close()
