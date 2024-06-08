@@ -1,7 +1,6 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify
 import sqlite3
 from sqlite3 import Error
-from datetime import datetime
 
 app = Flask(__name__)
 
@@ -59,6 +58,7 @@ def create_user_table():
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
     create_user_table()
+    print("I am trying to save the user's information")
     first_name = request.json.get('first_name')
     last_name = request.json.get('last_name')
     profile_picture = request.json.get('profile_picture')
@@ -219,18 +219,18 @@ def save_staff():
 @app.route('/crazy_borrow', methods=['POST'])
 def borrow_book():
     email = request.json.get('email')
-    book_title = request.json.get('book_title')
+    title = request.json.get('title')
     affiliation = request.json.get('affiliation')
     interest = request.json.get('interest')
     request_date = request.json.get('request_date')
-
-    if not email or not book_title or not affiliation or not interest:
+    
+    if not email or not title or not affiliation or not interest or not request_date:
         return jsonify({'error': 'No data provided'}), 400
 
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Pending_Request (Email, Title, Affiliation, Interest, Request_Date) VALUES (?, ?, ?, ?, ?)', (email, book_title, affiliation, interest, request_date))
+        cursor.execute('INSERT INTO Pending_Request (Email, Title, Affiliation, Interest, Request_Date) VALUES (?, ?, ?, ?, ?)', (email, title, affiliation, interest, request_date))
         connect.commit()
         cursor.close()
         connect.close()
@@ -241,6 +241,34 @@ def borrow_book():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
-   
+
+# Book Return Function
+@app.route('/crazy_return', methods=['POST'])
+def return_book():
+    email = request.json.get('email')
+    title = request.json.get('title')
+    returned_date = request.json.get('returned_date')
+    rating = request.json.get('rating')
+    review = request.json.get('review')
+
+    if not email or not title or not returned_date:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        connect = connection()
+        cursor = connect.cursor()
+        cursor.execute('UPDATE Book_Records SET Returned_Date = ?, Rating = ?, Review = ? WHERE Email = ? AND Title = ?', (returned_date, rating, review, email, title))
+        connect.commit()
+        cursor.close()
+        connect.close()
+
+        return jsonify({'message': 'Data saved'}), 201
+    except Error as e:
+        print(e)
+        return jsonify({'error': 'Error saving data'}), 500
+    
+# Book Availability Function
+
+
 if __name__ == '__main__':
     app.run(port=5000)    
