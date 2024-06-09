@@ -3,6 +3,16 @@ import sqlite3
 import pandas as pd
 import requests
 from datetime import datetime
+import server
+
+if 'first_name' in st.session_state and 'last_name' in st.session_state and 'email' in st.session_state and 'user_type' in st.session_state:
+    first_name = st.session_state.first_name
+    last_name = st.session_state.last_name
+    email = st.session_state.email
+    affiliation = st.session_state.user_type
+    st.header(f"Welcome, {first_name} {last_name}!")
+else:
+    st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
 
 st.title("Available Books!")
 
@@ -23,15 +33,13 @@ else:
 
 conn.close()
 
+
+
 st.title("Want to Borrow Book?")
 
-email = st.text_input('Email:')
-affiliation = st.text_input('Affiliation:')
+
 interest = st.text_input('Book Interests:')
 request_date =  st.date_input('Request Date:', datetime.today())
-
-def verifyEmail():
-    pass
 
 if st.button('Borrow Selected Books'):
     request_date_str = request_date.strftime('%Y-%m-%d')
