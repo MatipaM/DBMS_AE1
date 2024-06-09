@@ -4,12 +4,13 @@ import streamlit as st
 import pandas as pd
 
 # Librarian Book Request Review
-# 3 conditions: Returned all books, paid outstanding bills, 
+# 3 conditions: Returned all books AND paid outstanding bills, 
 # Use hello@gmail.com to test!!!!
 
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
-cursor.execute("SELECT Pending_Request.title, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email") #removed affiliation should be able to see from email
+#calc whether overdue instead of writing borrowed/returned date
+cursor.execute("SELECT Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email") #removed affiliation should be able to see from email
 rows = cursor.fetchall()
 columns = [description[0] for description in cursor.description]
 
@@ -25,16 +26,16 @@ else:
 
 # Criteria 1 (Returned all books)
 
-st.write("### Checklist 1: Outstanding Books")
-cursor.execute("SELECT br.Title, br.Borrowed_Date, br.Returned_Date, br.Email AS Borrower_Email, br.Rating, br.Review, pr.Email AS Requester_Email, pr.Request_Date FROM Book_Records br JOIN Pending_Request pr ON br.Email = pr.Email WHERE (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NOT NULL) OR (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NULL)")
-row2 = cursor.fetchall()
-column2 = [description[0] for description in cursor.description]
+# st.write("### Checklist 1: Outstanding Books")
+# cursor.execute("SELECT br.Title, br.Borrowed_Date, br.Returned_Date, br.Email AS Borrower_Email, br.Rating, br.Review, pr.Email AS Requester_Email, pr.Request_Date FROM Book_Records br JOIN Pending_Request pr ON br.Email = pr.Email WHERE (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NOT NULL) OR (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NULL)")
+# row2 = cursor.fetchall()
+# column2 = [description[0] for description in cursor.description]
 
-if row2:
-    df2 = pd.DataFrame(row2, columns=column2)
-    df2 = st.data_editor(df2, num_rows="dynamic")
-else:
-    st.write("No outstanding books.")
+# if row2:
+#     df2 = pd.DataFrame(row2, columns=column2)
+#     df2 = st.data_editor(df2, num_rows="dynamic")
+# else:
+#     st.write("No outstanding books.")
 
 
 
