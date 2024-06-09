@@ -16,8 +16,8 @@ street = st.text_area('Enter Street:')
 city = st.text_area('Enter City:')
 postal_code = st.text_area('Enter postal code:', max_chars=7)
 country = st.text_area('Enter country:')
-phone = st.text_input('Enter phone number:', value='+44 ', max_chars=11, placeholder="+447588720903") #can only take UK numbers
-email = st.text_input('Enter email:')
+phone = st.text_input('Enter phone number:', value='+44', max_chars=13, placeholder="+447588720903") #can only take UK numbers
+email = st.text_input('Enter email:', value=f"{first_name.lower()}{last_name.lower()}@student.com")
 password = st.text_input('Create password:', type='password')
 
 
@@ -27,15 +27,15 @@ def checkEmail():
     isValid = hasAt and hasDot and email.index('@') < email.rindex('.')
 
     if "@student" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_student', 'student'
+        return isValid, 'http://127.0.0.1:5000/crazy_student', 'student', ""
     elif "@administrator" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_administrator', 'administrator'
+        return isValid, 'http://127.0.0.1:5000/crazy_administrator', 'administrator', ""
     elif "@librarian" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_librarian', 'librarian'
+        return isValid, 'http://127.0.0.1:5000/crazy_librarian', 'librarian', ""
     elif "@staff" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_staff', 'staff'
+        return isValid, 'http://127.0.0.1:5000/crazy_staff', 'staff', ""
     else:
-        return isValid, 'http://127.0.0.1:5000/crazy_user', 'user'
+        return False, 'http://127.0.0.1:5000/crazy_user', 'user', "Please use a @student, @administrator, @librarian or @staff email"
 
 #not working
 def checkNames():
@@ -53,9 +53,9 @@ def checkNames():
         return False, "Names must be longer than one character"
 
 def checkPhoneNumber():
-    isNumeric = phone.isnumeric()
-    lengthValid = len(phone)==11
-    startsZero = str(phone).startswith("0")
+    isNumeric = phone[-12].strip().isnumeric()
+    lengthValid = len(phone)==13
+    startsZero = str(phone).startswith("+44")
 
     if isNumeric and lengthValid and startsZero:
         return True, ""
@@ -111,7 +111,7 @@ address = f"{street}, {city}, {country}, {postal_code}"
 
 if st.button('Submit'):
     
-    emailValid, email_route, table_name = checkEmail()
+    emailValid, email_route, table_name, email_error_message = checkEmail()
     if emailValid:
         isPasswordValid, password_message = checkPassword()
         userExists, email_message = user_exists(table_name)
@@ -139,6 +139,6 @@ if st.button('Submit'):
         else:
             st.error(name_message)
     else:
-        st.error("Invalid email format")
+        st.error(email_error_message)
 
 

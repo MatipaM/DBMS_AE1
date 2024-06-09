@@ -27,8 +27,11 @@ st.title("Want to Borrow Book?")
 
 email = st.text_input('Email:')
 affiliation = st.text_input('Affiliation:')
-interest = st.text_input('Book Interest:')
+interest = st.text_input('Book Interests:')
 request_date =  st.date_input('Request Date:', datetime.today())
+
+def verifyEmail():
+    pass
 
 if st.button('Borrow Selected Books'):
     request_date_str = request_date.strftime('%Y-%m-%d')
