@@ -14,15 +14,29 @@ def connection():
 
 @app.route('/crazy_books', methods=['POST'])
 def save():
+    print("save book function called")
     title = request.json.get('title')
     author = request.json.get('author')
-    if not title or not author:
+    publisher = request.json.get('publisher')
+    description = request.json.get('description')
+    version = request.json.get('version')
+    secondary_title = request.json.get('secondary_title')  
+    year_purchased = request.json.get('year_purchased')
+
+    print("code part 2 running")
+ 
+    # if not title or not author or not publisher or not description or not version or not secondary_title or not year_purchased:
+    if not title or not author or not publisher or not description or not version or not secondary_title or not year_purchased:
+        print(f"no data provided: title:{title} {author} {publisher} {description} {version} {secondary_title} {year_purchased}")
         return jsonify({'error': 'No data provided'}), 400
+    else:
+        print("all information input")
 
     try:
+        print("attempting to save book")
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Books (title, secondary_title, author, publisher, description, version, year_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)', (title, author, publisher, description, secondary_title, version, year_purchased))
+        cursor.execute('INSERT INTO Books (title, secondary_title, author, publisher, description, version, year_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)', (title, secondary_title, author, publisher, description, version, year_purchased))
         connect.commit()
         cursor.close()
         connect.close()
@@ -83,7 +97,6 @@ def save_user():
         return jsonify({'error': 'Error saving data'}), 500
 
 def create_table(table_name):
-    print(f"attempting to create {table_name}")
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()

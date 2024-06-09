@@ -3,9 +3,19 @@ import requests
 from datetime import datetime
 
 # Book Return Page
+
+
+if 'email' in st.session_state and 'user_type' in st.session_state:
+    email = st.session_state.email
+    affiliation = st.session_state.user_type
+
+else:
+    st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+
 st.title("Let's Return Book")
 
-email = st.text_input('Email:')
+
+
 title = st.text_input('Title:')
 return_date =  st.date_input('Return Date:', datetime.today())
 rating = st.number_input('Rating:', min_value = 1, max_value=5)

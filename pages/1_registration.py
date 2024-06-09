@@ -54,7 +54,7 @@ def checkNames():
         return False, "Names must be longer than one character"
 
 def checkPhoneNumber():
-    isNumeric = phone[-12].strip().isnumeric()
+    isNumeric = phone[1:].strip().isnumeric()
     lengthValid = len(phone)==13
     startsZero = str(phone).startswith("+44")
 
@@ -111,8 +111,8 @@ def user_exists(table_name):
 address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
-# if st.button('Submit'):
-if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
+if st.button('Submit'):
+# if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
     emailValid, email_route, table_name, email_error_message = checkEmail()
     if emailValid:
         isPasswordValid, password_message = checkPassword()
@@ -127,7 +127,7 @@ if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
                         if isPasswordValid:
                             response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
                             if response.status_code == 201:
-                                st.success('Account Created!')
+                                st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
                                     st.session_state.email = email
                                 
