@@ -39,10 +39,6 @@ def add_bg_from_local(image_path):
         unsafe_allow_html=True
     )
 
-# Path to your image
-image_path = "/Users/bilalidris/Desktop/Msc Computer Scinece & Aritficial Intelligence./DBMS_AE1/library1.jpg"
-add_bg_from_local(image_path)
-
 # Header with custom class for styling
 st.markdown('<h1 class="header">Library Management System</h1>', unsafe_allow_html=True)
 
