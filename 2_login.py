@@ -3,7 +3,6 @@ import base64
 import os
 import server
 import sqlite3
-import requests
 
 # Function to add background image
 def add_bg_from_local(image_path):
