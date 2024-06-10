@@ -22,11 +22,13 @@ def display():
         else:
             st.error('Failed to submit books')
 
-if "email" in st.session_state:
+if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
+    first_name = st.session_state.first_name
+    last_name = st.session_state.last_name
     if "librarian" in email:
         display()
     else:
-        st.error(f"{email} You are not authorised to view this page.")
+        st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
 else:
     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
