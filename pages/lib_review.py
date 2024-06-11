@@ -94,8 +94,8 @@ elif st.button("Disapprove"):
             reason += "You have unreturned books. "
         if outstanding_count > 0:
             reason += "You have outstanding bills. "
-        else:
-            reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
+        # else:
+        #     reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
         
         reasons.append(reason)
     conn.close()

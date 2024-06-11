@@ -100,10 +100,10 @@ if st.button('Login'):
             st.session_state.email = email
                                 
         if 'first_name' not in st.session_state:
-            st.session_state.first_name = first_name
+            st.session_state.first_name = first_name.capitalize()
 
         if 'last_name' not in st.session_state:
-            st.session_state.last_name = last_name
+            st.session_state.last_name = last_name.capitalize()
 
         if 'user_type' not in st.session_state:
             st.session_state.user_type = table_name
