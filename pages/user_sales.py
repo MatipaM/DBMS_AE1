@@ -41,8 +41,6 @@ if rows:
 else:
     st.write("No book for sale at this time.")
 
-conn.close()
-
 if st.button("Purchase"):
     purchased_books = df[df['Select'] == True]
 
@@ -52,11 +50,14 @@ if st.button("Purchase"):
             (row['Title'], row['Author'], row['Publisher'])
         )
         cursor.execute(
-            "INSERT INTO Transaction (Price, Date, Title, Author) VALUES (?, ?, ?, ?)",
+            "INSERT INTO `Transaction` (Price, Date, Title, Author) VALUES (?, ?, ?, ?)",
             (row['Price'], datetime.today().strftime('%Y-%m-%d'), row['Title'], row['Author'])
         )
+
     conn.commit()
     conn.close()
 
-    st.write("Books purchased! It will be delivered to you soon.")
+    st.write("Redirecting to payment page...")
+    st.switch_page("pages/payment.py")
+
     df = df[df['Select'] == False]
