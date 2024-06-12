@@ -57,43 +57,30 @@ email = st.text_input('Please enter email:')
 # Password input with label
 password = st.text_input("Please enter password: ")
 
-def user_exists(table_name):
+def user_exists():
     try:
         connect = server.connection()
         cursor = connect.cursor()
-        query = f'SELECT email, password, first_name, last_name FROM {table_name} where email=?'
+        query = f'SELECT email, password, first_name, last_name, affiliation FROM user where email=?'
         cursor.execute(query, (email,))
-        db_email, db_password, db_first_name, db_last_name = cursor.fetchone()
+        db_email, db_password, db_first_name, db_last_name, db_affiliation = cursor.fetchone()
         cursor.close()
         connect.close()
 
         if db_email == email:
             if password == db_password:
-                return True, "Login successful", db_first_name, db_last_name
+                return True, "Login successful", db_first_name, db_last_name, db_affiliation
             else:
-                return False, "incorrect password", "", ""
+                return False, "incorrect password", "", "", ""
         else:
-            return False, "Email is not associated with an account, Please register", "", ""
+            return False, "Email is not associated with an account, Please register", "", "", ""
     except sqlite3.Error as e:
         print(e)
-        return False, "error", "", ""
+        return False, "error", "", "", ""
     
 
-def checkEmail():
-    if "@student" in email:
-        return True,'student', 'http://127.0.0.1:5000/crazy_student'
-    elif "@administrator" in email:
-        return True, 'administrator', 'http://127.0.0.1:5000/crazy_administrator'
-    elif "@librarian" in email:
-        return True,'librarian', 'http://127.0.0.1:5000/crazy_librarian'
-    elif "@staff" in email:
-        return True, 'staff', 'http://127.0.0.1:5000/crazy_staff'
-    else:
-        return False, 'invalid email', ""
-
 if st.button('Login'):
-    emailValid, table_name, email_route = checkEmail()
-    userExists, email_message, first_name, last_name = user_exists(table_name) #if user exsists and password correct
+    userExists, email_message, first_name, last_name, affiliation = user_exists() #if user exsists and password correct
     if userExists:
         st.success('Logged in successfully!')
         if 'email' not in st.session_state:
@@ -106,7 +93,7 @@ if st.button('Login'):
             st.session_state.last_name = last_name
 
         if 'user_type' not in st.session_state:
-            st.session_state.user_type = table_name
+            st.session_state.user_type = affiliation
         else:
             st.error("Account not created succesfully :(")
     else:

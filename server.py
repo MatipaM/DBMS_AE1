@@ -56,6 +56,7 @@ def create_user_table():
                 last_name TEXT NOT NULL,
                 profile_picture TEXT,
                 address TEXT NOT NULL,
+                affiliation TEXT NOT NULL
                 phone TEXT NOT NULL,
                 email TEXT NOT NULL,
                 password TEXT NOT NULL
@@ -77,17 +78,18 @@ def save_user():
     last_name = request.json.get('last_name')
     profile_picture = request.json.get('profile_picture')
     address = request.json.get('address')  
+    affiliation = request.json.get('affiliation')  
     phone = request.json.get('phone')
     email = request.json.get('email')
     password= request.json.get('password')  
 
-    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
+    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password or not affiliation:
         return jsonify({'error': 'No data provided'}), 400
 
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO USER (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
+        cursor.execute('INSERT INTO USER (first_name, last_name, profile_picture, address, affiliation, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, affiliation, phone, email, password))
         connect.commit()
         cursor.close()
         connect.close()
@@ -96,135 +98,135 @@ def save_user():
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
 
-def create_table(table_name):
-    try:
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute(f'''
-            CREATE TABLE IF NOT EXISTS {table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                profile_picture TEXT,
-                address TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"{table_name} created successfully")
-    except Error as e:
-        print(e)
+# def create_table(table_name):
+#     try:
+#         conn = sqlite3.connect('database.db')
+#         cursor = conn.cursor()
+#         cursor.execute(f'''
+#             CREATE TABLE IF NOT EXISTS {table_name} (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 first_name TEXT NOT NULL,
+#                 last_name TEXT NOT NULL,
+#                 profile_picture TEXT,
+#                 address TEXT NOT NULL,
+#                 phone TEXT NOT NULL,
+#                 email TEXT NOT NULL,
+#                 password TEXT NOT NULL
+#             )
+#         ''')
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#         print(f"{table_name} created successfully")
+#     except Error as e:
+#         print(e)
 
-@app.route('/crazy_librarian', methods=['POST'])
-def save_librarian():
-    create_table("Librarian")
-    first_name = request.json.get('first_name')
-    last_name = request.json.get('last_name')
-    profile_picture = request.json.get('profile_picture')
-    address = request.json.get('address')  
-    phone = request.json.get('phone')
-    email = request.json.get('email')
-    password= request.json.get('password')  
+# @app.route('/crazy_librarian', methods=['POST'])
+# def save_librarian():
+#     create_table("Librarian")
+#     first_name = request.json.get('first_name')
+#     last_name = request.json.get('last_name')
+#     profile_picture = request.json.get('profile_picture')
+#     address = request.json.get('address')  
+#     phone = request.json.get('phone')
+#     email = request.json.get('email')
+#     password= request.json.get('password')  
 
-    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
-        return jsonify({'error': 'No data provided'}), 400
+#     if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
+#         return jsonify({'error': 'No data provided'}), 400
 
-    try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO librarian (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
-
-
-@app.route('/crazy_administrator', methods=['POST'])
-def save_administrator():
-    create_table("Administrator")
-    first_name = request.json.get('first_name')
-    last_name = request.json.get('last_name')
-    profile_picture = request.json.get('profile_picture')
-    address = request.json.get('address')  
-    phone = request.json.get('phone')
-    email = request.json.get('email')
-    password= request.json.get('password')  
-
-    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
-        return jsonify({'error': 'No data provided'}), 400
-
-    try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO Administrator (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
+#     try:
+#         connect = connection()
+#         cursor = connect.cursor()
+#         cursor.execute('INSERT INTO librarian (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
+#         connect.commit()
+#         cursor.close()
+#         connect.close()
+#         return jsonify({'message': 'Data saved'}), 201
+#     except Error as e:
+#         print(e)
+#         return jsonify({'error': 'Error saving data'}), 500
 
 
-@app.route('/crazy_student', methods=['POST'])
-def save_student():
-    create_table("Student")
-    first_name = request.json.get('first_name')
-    last_name = request.json.get('last_name')
-    profile_picture = request.json.get('profile_picture')
-    address = request.json.get('address')  
-    phone = request.json.get('phone')
-    email = request.json.get('email')
-    password= request.json.get('password')  
+# @app.route('/crazy_administrator', methods=['POST'])
+# def save_administrator():
+#     create_table("Administrator")
+#     first_name = request.json.get('first_name')
+#     last_name = request.json.get('last_name')
+#     profile_picture = request.json.get('profile_picture')
+#     address = request.json.get('address')  
+#     phone = request.json.get('phone')
+#     email = request.json.get('email')
+#     password= request.json.get('password')  
 
-    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
-        return jsonify({'error': 'No data provided'}), 400
+#     if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
+#         return jsonify({'error': 'No data provided'}), 400
 
-    try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO Student (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
+#     try:
+#         connect = connection()
+#         cursor = connect.cursor()
+#         cursor.execute('INSERT INTO Administrator (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
+#         connect.commit()
+#         cursor.close()
+#         connect.close()
+#         return jsonify({'message': 'Data saved'}), 201
+#     except Error as e:
+#         print(e)
+#         return jsonify({'error': 'Error saving data'}), 500
 
 
-@app.route('/crazy_staff', methods=['POST'])
-def save_staff():
-    create_table("Staff")
-    first_name = request.json.get('first_name')
-    last_name = request.json.get('last_name')
-    profile_picture = request.json.get('profile_picture')
-    address = request.json.get('address')  
-    phone = request.json.get('phone')
-    email = request.json.get('email')
-    password= request.json.get('password')  
+# @app.route('/crazy_student', methods=['POST'])
+# def save_student():
+#     create_table("Student")
+#     first_name = request.json.get('first_name')
+#     last_name = request.json.get('last_name')
+#     profile_picture = request.json.get('profile_picture')
+#     address = request.json.get('address')  
+#     phone = request.json.get('phone')
+#     email = request.json.get('email')
+#     password= request.json.get('password')  
 
-    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
-        return jsonify({'error': 'No data provided'}), 400
+#     if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
+#         return jsonify({'error': 'No data provided'}), 400
 
-    try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO Staff (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
+#     try:
+#         connect = connection()
+#         cursor = connect.cursor()
+#         cursor.execute('INSERT INTO Student (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
+#         connect.commit()
+#         cursor.close()
+#         connect.close()
+#         return jsonify({'message': 'Data saved'}), 201
+#     except Error as e:
+#         print(e)
+#         return jsonify({'error': 'Error saving data'}), 500
+
+
+# @app.route('/crazy_staff', methods=['POST'])
+# def save_staff():
+#     create_table("Staff")
+#     first_name = request.json.get('first_name')
+#     last_name = request.json.get('last_name')
+#     profile_picture = request.json.get('profile_picture')
+#     address = request.json.get('address')  
+#     phone = request.json.get('phone')
+#     email = request.json.get('email')
+#     password= request.json.get('password')  
+
+#     if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password:
+#         return jsonify({'error': 'No data provided'}), 400
+
+#     try:
+#         connect = connection()
+#         cursor = connect.cursor()
+#         cursor.execute('INSERT INTO Staff (first_name, last_name, profile_picture, address, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, phone, email, password))
+#         connect.commit()
+#         cursor.close()
+#         connect.close()
+#         return jsonify({'message': 'Data saved'}), 201
+#     except Error as e:
+#         print(e)
+#         return jsonify({'error': 'Error saving data'}), 500
 
 
 # Borrow Book Function

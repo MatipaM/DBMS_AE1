@@ -18,25 +18,19 @@ city = st.text_area('Enter City:')
 postal_code = st.text_area('Enter postal code:', max_chars=7)
 country = st.text_area('Enter country:')
 phone = st.text_input('Enter phone number:', value='+44', max_chars=13, placeholder="+447588720903") #can only take UK numbers
-email = st.text_input('Enter email (either @student.com, @staff.com, @librarian.com or @administrator.com): ', value=f"{first_name.lower()}{last_name.lower()}@student.com")
+affiliation = st.selectbox('Are you a: ', ('student', 'librarian', 'staff', 'administrator'))
+email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lower()}@{affiliation}.com")
 password = st.text_input('Create password:', type='password')
-
 
 def checkEmail():
     hasAt = '@' in email
     hasDot = '.' in email
     isValid = hasAt and hasDot and email.index('@') < email.rindex('.')
 
-    if "@student" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_student', 'student', ""
-    elif "@administrator" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_administrator', 'administrator', ""
-    elif "@librarian" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_librarian', 'librarian', ""
-    elif "@staff" in email:
-        return isValid, 'http://127.0.0.1:5000/crazy_staff', 'staff', ""
+    if isValid:
+        return isValid, 'http://127.0.0.1:5000/crazy_user'
     else:
-        return False, 'http://127.0.0.1:5000/crazy_user', 'user', "Please use a @student, @administrator, @librarian or @staff email"
+        return isValid, "Not a valid email"
 
 #not working
 def checkNames():
@@ -90,11 +84,11 @@ def checkPostal():
     else:
         return False, "Postal code must be between 5 and 7 letters"
     
-def user_exists(table_name):
+def user_exists():
     try:
         connect = server.connection()
         cursor = connect.cursor()
-        query = f'SELECT email FROM {table_name} where email=?'
+        query = f'SELECT email FROM user where email=?'
         cursor.execute(query, (email,))
         emails = cursor.fetchone()
         cursor.close()
@@ -111,12 +105,15 @@ def user_exists(table_name):
 address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
+
+# check affiliation and email match
+
 if st.button('Submit'):
 # if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
-    emailValid, email_route, table_name, email_error_message = checkEmail()
+    emailValid, email_route = checkEmail()
     if emailValid:
         isPasswordValid, password_message = checkPassword()
-        userExists, email_message = user_exists(table_name)
+        userExists, email_message = user_exists()
         phoneValid, phone_message = checkPhoneNumber()
         namesValid, name_message = checkNames()
         postalValid, postal_message = checkPostal()
@@ -125,7 +122,7 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
                             if response.status_code == 201:
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
@@ -152,6 +149,6 @@ if st.button('Submit'):
         else:
             st.error(name_message)
     else:
-        st.error(email_error_message)
+        st.error(email_route)
 
 
