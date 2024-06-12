@@ -65,6 +65,7 @@ def user_exists():
         cursor.execute(query, (email,))
         print(cursor.fetchone())
         db_email, db_password, db_first_name, db_last_name, db_affiliation = cursor.fetchone()
+        # print(f"cursor: {cursor.fetchone}")
         cursor.close()
         connect.close()
 

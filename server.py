@@ -56,7 +56,7 @@ def create_user_table():
                 last_name TEXT NOT NULL,
                 profile_picture TEXT,
                 address TEXT NOT NULL,
-                affiliation TEXT NOT NULL,
+                affiliation TEXT NOT NULL
                 phone TEXT NOT NULL,
                 email TEXT NOT NULL,
                 password TEXT NOT NULL
@@ -97,6 +97,7 @@ def save_user():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+
 
 # Borrow Book Function
 
