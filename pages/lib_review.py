@@ -108,3 +108,19 @@ elif st.button("Disapprove"):
 
 
 
+# This is librarian sales review section
+
+st.write("### Transactions")
+
+cursor.execute("SELECT * FROM `Transaction`")
+rows = cursor.fetchall()
+columns = [description[0] for description in cursor.description]
+
+if rows:
+    df = pd.DataFrame(rows, columns=columns)
+    st.write(df)
+else:
+    st.write("No transactions.")
+
+
+
