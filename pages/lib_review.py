@@ -11,7 +11,7 @@ def display():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email") #removed affiliation should be able to see from email
+    cursor.execute("SELECT distinct Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email") #removed affiliation should be able to see from email
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -115,6 +115,6 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
     if "librarian" in email:
         display()
     else:
-        st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
+        st.error(f"{first_name} {last_name}, you're {email} is not authorised to access this page.")
 else:
     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)

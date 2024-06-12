@@ -3,10 +3,12 @@ import server
 import sqlite3
 import pandas as pd
 
-st.title("Home Page")
-st.write("Welcome to the Library Management System")
+
 
 def display():
+    st.title(f"{first_name} {last_name}'s Home Page")
+    st.write("Welcome to the Library Management System")
+
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     cursor.execute("SELECT Title, affiliation, interest, email, request_date FROM pending_request where email=?",(st.session_state.email,))

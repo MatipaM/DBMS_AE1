@@ -46,7 +46,7 @@ def display():
 
         response = requests.post('http://127.0.0.1:5000/crazy_borrow', json={'email': email, 'title': title, 'affiliation': affiliation, 'interest': interest, 'request_date': request_date_str})
         if response.status_code == 201:
-            st.success('Books submitted!')
+            st.success('Book requested!')
             #st.switch_page("pages/wait.py")
         else:
             st.error('Failed to submit books')
