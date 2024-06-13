@@ -230,6 +230,21 @@ def create_sales_table():
                 Price INTEGER NOT NULL
             )
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS `Transaction` (
+                Price INTEGER NOT NULL,
+                Date TEXT NOT NULL, 
+                Title TEXT NOT NULL,
+                Author TEXT NOT NULL
+            )
+        ''')
+        # cursor.execute('''
+        #                INSERT INTO Sales (Title, Author, Publisher, Description, Year_Purchased, Secondary_Title, Version, Price)
+        #                 VALUES ('The Great Gatsby', 'F. Scott Fitzgerald', 'Charles Scribners Sons', 'The story of the fabulously wealthy Jay Gatsby and his love for the beautiful Daisy', 1925, 'None', 1, 20), 
+        #                 ('The Catcher in the Rye', 'J.D. Salinger', 'Little, Brown and Company', 'The story of Holden Caulfield, a teenager from New York City', 1951, 'None', 1, 20),
+        #                 ('To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', 'The story of a young bird', 1960, 'None', 1, 20),
+        #                 ('1984', 'George Orwell', 'Secker & Warburg', 'The story of Winston Smith', 1949, 'None', 1, 20)
+        #                ''')
         conn.commit()
         cursor.close()
         conn.close()
@@ -238,6 +253,22 @@ def create_sales_table():
         print(e)
     
 create_sales_table()
+
+# create transaction table
+
+# def create_transaction_table():
+#     try:
+#         conn = sqlite3.connect('database.db')
+#         cursor = conn.cursor()
+
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#         print("Transaction table created successfully")
+#     except Error as e:
+#         print(e)
+
+# create_transaction_table()
 
 # Borrow Book Function
 
