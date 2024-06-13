@@ -63,7 +63,6 @@ def user_exists():
         cursor = connect.cursor()
         query = f'SELECT email, password, first_name, last_name, affiliation FROM user where email=?'
         cursor.execute(query, (email,))
-        print(cursor.fetchone())
         db_email, db_password, db_first_name, db_last_name, db_affiliation = cursor.fetchone()
         cursor.close()
         connect.close()
@@ -77,7 +76,7 @@ def user_exists():
             return False, "Email is not associated with an account, Please register", "", "", ""
     except sqlite3.Error as e:
         print(e)
-        return False, "error", "", "", ""
+        return False, "Not logged in successfully, please try again :(", "", "", ""
     
 
 if st.button('Login'):
@@ -95,8 +94,6 @@ if st.button('Login'):
 
         if 'user_type' not in st.session_state:
             st.session_state.user_type = affiliation
-        else:
-            st.error("Account not created succesfully :(")
     else:
         st.error(email_message)
 
