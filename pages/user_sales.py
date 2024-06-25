@@ -8,22 +8,7 @@ st.title("Book Sales Section")
 
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
-
-cursor.execute("SELECT * FROM Books GROUP BY Title, Author, Publisher, Year_Purchased, Description, Secondary_Title, Version HAVING COUNT(*) > 1")
-books_rows = cursor.fetchall()
-
-for row in books_rows:
-    cursor.execute("INSERT INTO Sales (Title, Author, Publisher, Description, Year_Purchased, Secondary_Title, Version, Price) VALUES (?, ?, ?, ?, ?, ?, ?, NULL)", (row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
-
-    cursor.execute("""
-        WITH CTE AS (
-            SELECT rowid,Title, Author, Publisher, Description, Year_Purchased, Secondary_Title, Version, ROW_NUMBER() OVER (PARTITION BY Title, Author, Publisher, Description, Year_Purchased, Secondary_Title, Version ORDER BY (SELECT NULL)) AS rn FROM Books)
-        DELETE FROM Books
-        WHERE rowid IN (SELECT rowid FROM CTE WHERE rn > 1 LIMIT 1); """)
-
-conn.commit()
-
-cursor.execute("SELECT Title, Author, Publisher, Price FROM Sales")
+cursor.execute("SELECT * FROM Sales")
 rows = cursor.fetchall()
 columns = [description[0] for description in cursor.description]
 
@@ -46,12 +31,12 @@ if st.button("Purchase"):
 
     for index, row in purchased_books.iterrows():
         cursor.execute(
-            "DELETE FROM Sales WHERE Title = ? AND Author = ? AND Publisher = ?",
-            (row['Title'], row['Author'], row['Publisher'])
+            "DELETE FROM Sales WHERE SalesID = ? AND BookID = ? AND Year_Purchased = ? AND Price = ?",
+            (row['SalesID'], row['BookID'], row['Year_Purchased'], row['Price'])
         )
         cursor.execute(
-            "INSERT INTO `Transaction` (Price, Date, Title, Author) VALUES (?, ?, ?, ?)",
-            (row['Price'], datetime.today().strftime('%Y-%m-%d'), row['Title'], row['Author'])
+            "INSERT INTO `Transaction` (SalesID, Date) VALUES (?, ?)",
+            (row['SalesID'], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         )
 
     conn.commit()
