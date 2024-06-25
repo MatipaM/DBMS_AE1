@@ -1,10 +1,10 @@
 import streamlit as st
 import requests
-import server
+# import server
 
 
 def display():
-    server.create_books() 
+    # server.create_books() 
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     st.title("Let's submit some books for the Library!")
 
