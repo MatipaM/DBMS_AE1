@@ -4,6 +4,7 @@ from sqlite3 import Error
 
 app = Flask(__name__)
 
+
 def connection():
     conn = None
     try:
@@ -22,12 +23,13 @@ def save():
     version = request.json.get('version')
     secondary_title = request.json.get('secondary_title')  
     year_purchased = request.json.get('year_purchased')
+    quantity = request.json.get('quantity')
 
     print("code part 2 running")
  
     # if not title or not author or not publisher or not description or not version or not secondary_title or not year_purchased:
-    if not title or not author or not publisher or not description or not version or not secondary_title or not year_purchased:
-        print(f"no data provided: title:{title} {author} {publisher} {description} {version} {secondary_title} {year_purchased}")
+    if not title or not author or not publisher or not description or not version or not secondary_title or not year_purchased or not quantity:
+        print(f"no data provided: title:{title} {author} {publisher} {description} {version} {secondary_title} {year_purchased} {quantity}")
         return jsonify({'error': 'No data provided'}), 400
     else:
         print("all information input")
@@ -36,7 +38,7 @@ def save():
         print("attempting to save book")
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Books (title, secondary_title, author, publisher, description, version, year_purchased) VALUES (?, ?, ?, ?, ?, ?, ?)', (title, secondary_title, author, publisher, description, version, year_purchased))
+        cursor.execute('INSERT INTO Books (title, secondary_title, author, publisher, description, version, year_purchased, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (title, secondary_title, author, publisher, description, version, year_purchased, quantity))
         connect.commit()
         cursor.close()
         connect.close()
@@ -97,7 +99,30 @@ def save_user():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
-
+    
+def create_books():
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS Books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                publisher TEXT,
+                year_purchased TEXT NOT NULL,
+                description TEXT NOT NULL,
+                secondary_title TEXT NOT NULL,
+                version TEXT NOT NULL,
+                quantity INTEGER NOT NULL
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("Book table created successfully")
+    except Error as e:
+        print(e)
 
 # Borrow Book Function
 
@@ -155,6 +180,9 @@ def return_book():
     
 # Book Availability Function
 
+create_books()
+
 
 if __name__ == '__main__':
-    app.run(port=5000)    
+    app.run(port=5000)   
+
