@@ -1,6 +1,12 @@
+import sqlite3
 import streamlit as st
 import requests
 # import server
+
+def addBookToSales():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    # cursor.execute("INSERT INTO `SALES` (SalesID, Date) VALUES (?, ?)",)
 
 
 def display():
@@ -20,6 +26,11 @@ def display():
 
     if st.button('Submit'):
         response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': title, 'author': author, 'publisher': publisher, 'year_purchased': year_purchased, 'description': description, 'secondary_title':secondary_title, 'version':version, 'quantity': quantity})
+
+        if quantity>1:
+            response2 = requests.post('http://127.0.0.1:5000/crazy_sale', json={'book_id': book_id, 'sales_id': sales_id, 'year_purchased': year_purchased, 'price': price})
+
+
         if response.status_code == 201:
             st.success('Books submitted!')
         else:

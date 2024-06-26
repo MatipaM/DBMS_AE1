@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, make_response, request, jsonify
 import sqlite3
 from sqlite3 import Error
 
@@ -42,6 +42,7 @@ def save():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+    
 
 def create_user_table():
     try:
@@ -200,13 +201,37 @@ def sales_table():
         connect.commit()
         cursor.close()
         connect.close()
-        return jsonify({'message': 'Data saved'}), 201
+        return make_response('Data saved', 201)
     except sqlite3.Error as e:
+        print(e)
+        return make_response('Error saving data', 500)
+    
+@app.route('/crazy_sale', methods=['POST'])
+def save_sale():
+    sales_table()
+    print("I am trying to save the sales information")
+    book_id = request.json.get('book_id')
+    sales_id = request.json.get('sales_id')
+    year_purchased = request.json.get('year_purchased')
+    price = request.json.get('price')  
+
+    if not book_id or not sales_id or not year_purchased or not price:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        connect = connection()
+        cursor = connect.cursor()
+        cursor.execute('INSERT INTO USER (book_id, sales_id, year_purchased, price) VALUES (?, ?, ?, ?)', (book_id, sales_id, year_purchased, price))
+        connect.commit()
+        cursor.close()
+        connect.close()
+        return jsonify({'message': 'Data saved'}), 201
+    except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
 
 create_books()
-# sales_table()
+sales_table()
 
 
 if __name__ == '__main__':

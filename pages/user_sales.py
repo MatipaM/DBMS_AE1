@@ -10,6 +10,7 @@ conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM Sales")
 rows = cursor.fetchall()
+print(cursor.description)
 columns = [description[0] for description in cursor.description]
 
 #this is probably a stupid way to do it but it works, anyways please make it better if you can
@@ -17,6 +18,7 @@ rows = [list(row) for row in rows]
 for row in rows:
     if row[3] is None:
         row[3] = 20
+
 
 if rows:
     df = [(row[0], row[1], row[2], f'£{row[3]}') for row in rows]
