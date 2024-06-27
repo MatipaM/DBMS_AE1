@@ -106,7 +106,7 @@ address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
 
-# check affiliation and email match
+print(affiliation)
 
 if st.button('Submit'):
 # if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):

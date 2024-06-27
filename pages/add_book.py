@@ -16,10 +16,15 @@ def display():
     secondary_title = st.text_area('Enter secondary title:')
     version = st.text_area('Enter version:')
     quantity = st.number_input('Enter number of books: ', min_value= 1)
+    price = st.number_input('Enter re-sale price of book')
+    available = "True"
+    review = ""
+    rating=""
+
 
 
     if st.button('Submit'):
-        response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': title, 'author': author, 'publisher': publisher, 'year_purchased': year_purchased, 'description': description, 'secondary_title':secondary_title, 'version':version, 'quantity': quantity})
+        response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': title, 'author': author, 'publisher': publisher, 'year_purchased': year_purchased, 'description': description, 'secondary_title':secondary_title, 'version':version, 'quantity': quantity, 'price':price,'avaialble': available, 'review': review, 'rating': rating})
         if response.status_code == 201:
             st.success('Books submitted!')
         else:
