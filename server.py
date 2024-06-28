@@ -65,7 +65,7 @@ def create_books():
         print(e)
 
 def create_outstanding_bills():
-     try:
+    try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
@@ -114,7 +114,7 @@ def create_sales_table():
         print(e)
 
 def create_pending_request():
-     try:
+    try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
@@ -135,7 +135,7 @@ def create_pending_request():
         print(e)
 
 def create_book_records():
-     try:
+    try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
