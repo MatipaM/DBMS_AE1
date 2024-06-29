@@ -1,34 +1,50 @@
+import random
 import streamlit as st
 import requests
-# import server
-
 
 def display():
-    # server.create_books() 
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     st.title("Let's submit some books for the Library!")
 
+    id = random.randint(1, 100);
     title = st.text_area('Enter title:')
     author = st.text_area('Enter Author:')
     publisher = st.text_area('Enter Publisher:')
-    year_purchased = st.text_area('Enter Year Published:')
+    year_purchased = st.text_area('Enter Year purchased:')
+    year_published = st.text_area('Enter Year published:')
     description = st.text_area('Enter description:')
     secondary_title = st.text_area('Enter secondary title:')
     version = st.text_area('Enter version:')
-    quantity = st.number_input('Enter number of books: ', min_value= 1)
+    quantity = st.number_input('Enter number of books: ', min_value=1)
     price = st.number_input('Enter re-sale price of book')
-    available = "True"
+    available = "TORENT"  # Default value for testing
     review = ""
-    rating=""
-
-
+    rating = ""
 
     if st.button('Submit'):
-        response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': title, 'author': author, 'publisher': publisher, 'year_purchased': year_purchased, 'description': description, 'secondary_title':secondary_title, 'version':version, 'quantity': quantity, 'price':price,'avaialble': available, 'review': review, 'rating': rating})
+        payload = {
+
+            'title': title,
+            'author': author,
+            'publisher': publisher,
+            'year_purchased': year_purchased,
+            'year_published': year_published,
+            'description': description,
+            'secondary_title': secondary_title,
+            'version': version,
+            'quantity': quantity,
+            'price': price,
+            'available': available,  # Fixed typo here
+            'review': review,
+            'rating': rating
+        }
+
+        response = requests.post('http://127.0.0.1:5000/crazy_books', json=payload)
+
         if response.status_code == 201:
             st.success('Books submitted!')
         else:
-            st.error('Failed to submit books')
+            st.error(f'Failed to submit books: {response.status_code}')
 
 if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
