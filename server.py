@@ -72,13 +72,13 @@ def create_outstanding_bills():
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS Outstanding_Bills (
                 email TEXT PRIMARY KEY  NOT NULL,
-                price TEXT NOT NULL,
+                price TEXT NOT NULL
             )
         ''')
         conn.commit()
         cursor.close()
         conn.close()
-        print("Book table created successfully")
+        print("outstanding bills table created successfully")
     except Error as e:
         print(e)
 
@@ -119,7 +119,7 @@ def create_pending_request():
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS Outstanding_Bills (
+            CREATE TABLE IF NOT EXISTS Pending_Request (
                 email TEXT PRIMARY KEY  NOT NULL,
                 date_request TEXT NOT NULL,
                 title TEXT NOT NULL,
@@ -131,7 +131,7 @@ def create_pending_request():
         conn.commit()
         cursor.close()
         conn.close()
-        print("Book table created successfully")
+        print("pending request table created successfully")
     except Error as e:
         print(e)
 
@@ -144,13 +144,13 @@ def create_book_records():
                 id TEXT PRIMARY KEY  NOT NULL,
                 borrowed_date TEXT NOT NULL,
                 returned_date TEXT NOT NULL,
-                email TEXT NOT NULL,
+                email TEXT NOT NULL
             )
         ''')
         conn.commit()
         cursor.close()
         conn.close()
-        print("Book table created successfully")
+        print("Book records table created successfully")
     except Error as e:
         print(e)
 
@@ -316,6 +316,14 @@ def save_sale():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+
+
+create_book_records()
+create_books()
+create_outstanding_bills()
+create_pending_request()
+create_sales_table()
+create_user_table()
 
 if __name__ == '__main__':
     app.run(port=5000)
