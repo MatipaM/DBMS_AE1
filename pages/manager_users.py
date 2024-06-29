@@ -10,19 +10,52 @@ st.write("Autennticate Librarians")
 st.title("Manage user Access")
 
 Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage users","manager", "payment", "request book","return book","users sales"]
+column_headings = ["Pages user has access to", "Approve"]
+buttons = []
 
-st.write("Adminstrators")
-df = pd.DataFrame(Project)
-st.table(df)
+# st.header("Adminstrators:")
+# for i in Project:
+#     new_select = st.checkbox(f"Select Administrators {i}");
+#     buttons.append(new_select);
 
-st.write("Students")
-df = pd.DataFrame(Project)
-st.table(df)
+# df1 = pd.DataFrame({
+#     'Pages user has access to': Project,
+#     'Approve': buttons
+# })
 
-st.write("staff")
-df = pd.DataFrame(Project)
-st.table(df)
+# st.header("Students:")
+# buttons = []
+# for i in Project:
+#     new_select = st.checkbox(f"Select Students {i}");
+#     buttons.append(new_select);
 
-st.write("Librarians")
-df = pd.DataFrame(Project)
-st.table(df)
+# df2 = pd.DataFrame({
+#     'Pages user has access to': Project,
+#     'Approve': buttons
+# })
+
+# st.header("staff:")
+# buttons = []
+# for i in Project:
+#     new_select = st.checkbox(f"Select Staff {i}");
+#     buttons.append(new_select);
+
+# df3 = pd.DataFrame({
+#     'Pages user has access to': Project,
+#     'Approve': buttons
+# })
+
+
+
+positions = ["staff", "students", "administrator", "librarians"]
+for a in range(4):
+    st.header(positions[a])
+    buttons=[]
+    for b in Project:
+        new_select = st.checkbox(f"{positions[a]}: approve access to {b} page");
+        buttons.append(new_select);
+
+    df4 = pd.DataFrame({
+        'Pages user has access to': Project,
+        'Approve': buttons
+})
