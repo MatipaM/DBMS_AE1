@@ -62,9 +62,14 @@ def display():
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_Records (Title, Borrowed_Date, Email, Returned_Date, Rating, Review) VALUES (?, ?, ?, NULL, NULL, NULL)",
+                "INSERT INTO Book_Records (id, Borrowed_Date, Email, Returned_Date) VALUES (?, ?, ?, NULL, NULL, NULL)",
                 (row['Title'], row['Request_Date'], row['Email'])
             )
+
+            # cursor.execute(
+            #     update books to include rating, review where book_records.id == book.id
+            # )
+
             cursor.execute(
                 "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
                 (row['Title'], row['Email'], row['Request_Date'])
