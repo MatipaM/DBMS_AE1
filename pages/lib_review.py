@@ -14,6 +14,10 @@ def display():
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
+    st.write("### Add Books to Library")
+    if st.button("Add Books"):
+        st.switch_page("pages/add_book.py")
+
     st.write("### Pending Book Requests")
 
     if rows:
