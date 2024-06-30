@@ -5,15 +5,18 @@ import pandas as pd
 
 # Librarian Book Request Review
 # 3 conditions: Returned all books AND paid outstanding bills, 
-# Use hello@gmail.com to test!!!!
 
 def display():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT distinct Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email") #removed affiliation should be able to see from email
+    cursor.execute("SELECT DISTINCT Book_records.borrowed_date, Book_records.returned_date, Books.rating, Books.review, Outstanding_Bills.title, Outstanding_Bills.affiliation, Outstanding_Bills.email, Outstanding_Bills.date_request FROM Outstanding_Bills LEFT JOIN Book_records ON Outstanding_Bills.email = Book_records.email LEFT JOIN Books ON Book_records.id = Books.id")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
+
+    st.write("### Add Books to Library")
+    if st.button("Add Books"):
+        st.switch_page("pages/add_book.py")
 
     st.write("### Pending Book Requests")
 
@@ -24,46 +27,14 @@ def display():
     else:
         st.write("No Book Requests.")
 
-
-    # Criteria 1 (Returned all books)
-
-    # st.write("### Checklist 1: Outstanding Books")
-    # cursor.execute("SELECT br.Title, br.Borrowed_Date, br.Returned_Date, br.Email AS Borrower_Email, br.Rating, br.Review, pr.Email AS Requester_Email, pr.Request_Date FROM Book_Records br JOIN Pending_Request pr ON br.Email = pr.Email WHERE (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NOT NULL) OR (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NULL)")
-    # row2 = cursor.fetchall()
-    # column2 = [description[0] for description in cursor.description]
-
-    # if row2:
-    #     df2 = pd.DataFrame(row2, columns=column2)
-    #     df2 = st.data_editor(df2, num_rows="dynamic")
-    # else:
-    #     st.write("No outstanding books.")
-
-
-
-    # Criteria 3 (Current Student)
-
-    # st.write("### Checklist 3: Current Student")
-
-    # cursor.execute("SELECT Email, Affiliation FROM Pending_Request")
-    # row4 = cursor.fetchall()
-    # column4 = [description[0] for description in cursor.description]
-
-
-    # if row4:
-    #     df4 = pd.DataFrame(row4, columns=column4)
-    #     df4 = st.data_editor(df4, num_rows="dynamic")
-    # else:
-    #     st.write("No current students.")
-
     # Approve or Disapprove Button
-
     if st.button("Approve"):
         approved_requests = df[df['Select'] == True]
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_Records (id, Borrowed_Date, Email, Returned_Date) VALUES (?, ?, ?, NULL, NULL, NULL)",
-                (row['Title'], row['Request_Date'], row['Email'])
+                "INSERT INTO Book_records (id, borrowed_date, email, returned_date, rating, review) VALUES (?, ?, ?, NULL, NULL, NULL)",
+                (row['id'], row['Request_Date'], row['Email'])
             )
 
             # cursor.execute(
@@ -71,28 +42,28 @@ def display():
             # )
 
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
                 (row['Title'], row['Email'], row['Request_Date'])
             )
         conn.commit()
         conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Approved!")
+        st.write("You have approved the book request!")
 
     elif st.button("Disapprove"):
         disapproved_requests = df[df['Select'] == True]
         reasons = []
         for index, row in disapproved_requests.iterrows():
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
                 (row['Title'], row['Email'], row['Request_Date'])
             )
             conn.commit()
-            cursor.execute("SELECT COUNT(*) FROM Book_Records WHERE Returned_Date IS NULL")
+            cursor.execute("SELECT COUNT(*) FROM Book_records WHERE returned_date IS NULL")
             unreturned_count = cursor.fetchone()[0]
             
-            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE Email = ?", (row['Email'],))
+            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE email = ?", (row['Email'],))
             outstanding_count = cursor.fetchone()[0]
             
             reason = f"Request for {row['Title']} by {row['Email']} disapproved because: "
@@ -100,26 +71,28 @@ def display():
                 reason += "You have unreturned books. "
             if outstanding_count > 0:
                 reason += "You have outstanding bills. "
+            if not row['Email'].endswith('@student.com'):
+                reason += "Your email does not end with @student.com. "
             # else:
             #     reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
-            
             reasons.append(reason)
         conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Disapproved!")
+        st.write("You have disapproved the book request!")
 
         #Students need to be notified
         st.session_state.disapproval_reasons = reasons
 
+display()
 
-if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
-    email = st.session_state.email
-    first_name = st.session_state.first_name
-    last_name = st.session_state.last_name
-    if "librarian" in email:
-        display()
-    else:
-        st.error(f"{first_name} {last_name}, you're {email} is not authorised to access this page.")
-else:
-    st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+# if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+#     email = st.session_state.email
+#     first_name = st.session_state.first_name
+#     last_name = st.session_state.last_name
+#     if "librarian" in email:
+#         display()
+#     else:
+#         st.error(f"{first_name} {last_name}, you're {email} is not authorised to access this page.")
+# else:
+#     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)

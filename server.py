@@ -40,24 +40,21 @@ def create_books():
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS Books (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                author TEXT NOT NULL,
-                publisher TEXT,
-                year_purchased TEXT NOT NULL,
-                year_published TEXT NOT NULL,
-                description TEXT NOT NULL,
-                secondary_title TEXT NOT NULL,
-                version TEXT NOT NULL,
-                quantity INTEGER NOT NULL,
-                available TEXT NOT NULL,
-                rating TEXT NOT NULL,
-                review TEXT NOT NULL,
-                price TEXT NOT NULL
-            )
-        ''')
+        conn.execute('''CREATE TABLE IF NOT EXISTS Books
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    author TEXT NOT NULL,
+                    publisher TEXT NOT NULL,
+                    year_purchased TEXT NOT NULL,
+                    year_published TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    secondary_title TEXT NOT NULL,
+                    version TEXT NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    available INTEGER NOT NULL,
+                    rating INTEGER NOT NULL,
+                    review TEXT,
+                    price INTEGER NOT NULL)''')
         conn.commit()
         cursor.close()
         conn.close()
@@ -177,42 +174,43 @@ def save_outstanding_bills():
         return jsonify({'error': 'Error saving data'}), 500
 
 @app.route('/crazy_books', methods=['POST'])
-def save_book():
-    create_books()
-    print("I am trying to save the book's information")
-
-    data = request.json
-    print("Received data:", data)
-
-    id = random.randint(1, 100)
-    title = data.get('title')
-    author = data.get('author')
-    publisher = data.get('publisher')
-    year_purchased = data.get('year_purchased')
-    year_published = data.get('year_published')
-    description = data.get('description')
-    secondary_title = data.get('secondary_title')
-    version = data.get('version')
-    quantity = data.get('quantity')
-    available = data.get('available')
-    rating = data.get('rating')
-    review = data.get('review')
-    price = data.get('price')
-
-    if not title or not author or not year_purchased or not year_published or not description or not secondary_title or not version or not quantity or not available or not rating or not review or not price:
-        return jsonify({'error': 'No data provided'}), 400
-
+def save():
     try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO Books (id, title, author, publisher, year_purchased, year_published, description, secondary_title, version, quantity, available, rating, review, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (id, title, author, publisher, year_purchased, year_published, description, secondary_title, version, quantity, available, rating, review, price))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        required = ['title', 'author', 'publisher', 'year_purchased', 'description', 
+                           'secondary_title', 'version', 'quantity', 'available', 'rating', 'price']
+        
+        for r in required:
+            if r not in data:
+                return jsonify({"error": f"Missing required field: {r}"}), 400
+
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                '''
+                INSERT INTO Books (title, author, publisher, year_purchased, year_published, description, 
+                                secondary_title, version, quantity, available, rating, 
+                                review, price)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', 
+                (data['title'], data['author'], data['publisher'], data['year_purchased'],
+                data['year_published'], data['description'], data['secondary_title'], data['version'], 
+                int(data['quantity']), int(data['available']), int(data['rating']), 
+                data.get('review'), float(data['price']))
+            )
+            conn.commit()
+
+        return jsonify({"message": "Book submitted successfully"}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
 
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
@@ -326,4 +324,6 @@ create_sales_table()
 create_user_table()
 
 if __name__ == '__main__':
+    create_books()  # Call create_books() only if running this script directly
+    sales_table()   # Call sales_table() only if running this script directly
     app.run(port=5000)

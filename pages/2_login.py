@@ -94,7 +94,10 @@ if st.button('Login'):
 
         if 'user_type' not in st.session_state:
             st.session_state.user_type = affiliation
+    
+        if email.endswith('@student.com'):
+            st.switch_page("pages/home.py")
+        elif email.endswith('@librarian.com'):
+            st.switch_page("pages/lib_review.py")
     else:
         st.error(email_message)
-
- 
