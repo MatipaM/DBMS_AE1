@@ -24,17 +24,16 @@ def display():
         st.write("No Book Requests.")
 
     # Approve or Disapprove Button
-
     if st.button("Approve"):
         approved_requests = df[df['Select'] == True]
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_Records (Title, Borrowed_Date, Email, Returned_Date, Rating, Review) VALUES (?, ?, ?, NULL, NULL, NULL)",
-                (row['Title'], row['Request_Date'], row['Email'])
+                "INSERT INTO Book_records (id, borrowed_date, email, returned_date, rating, review) VALUES (?, ?, ?, NULL, NULL, NULL)",
+                (row['id'], row['Request_Date'], row['Email'])
             )
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
                 (row['Title'], row['Email'], row['Request_Date'])
             )
         conn.commit()
@@ -48,14 +47,14 @@ def display():
         reasons = []
         for index, row in disapproved_requests.iterrows():
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
                 (row['Title'], row['Email'], row['Request_Date'])
             )
             conn.commit()
-            cursor.execute("SELECT COUNT(*) FROM Book_Records WHERE Returned_Date IS NULL")
+            cursor.execute("SELECT COUNT(*) FROM Book_records WHERE returned_date IS NULL")
             unreturned_count = cursor.fetchone()[0]
             
-            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE Email = ?", (row['Email'],))
+            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE email = ?", (row['Email'],))
             outstanding_count = cursor.fetchone()[0]
             
             reason = f"Request for {row['Title']} by {row['Email']} disapproved because: "
