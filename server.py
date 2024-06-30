@@ -324,6 +324,4 @@ create_sales_table()
 create_user_table()
 
 if __name__ == '__main__':
-    create_books()  # Call create_books() only if running this script directly
-    sales_table()   # Call sales_table() only if running this script directly
     app.run(port=5000)
