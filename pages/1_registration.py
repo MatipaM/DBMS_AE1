@@ -3,6 +3,7 @@ import requests
 from string import punctuation
 import server
 import sqlite3
+from InfoManager import InfoManager
 #import phonenumbers
 
 st.title("Registration Page")
@@ -140,12 +141,11 @@ if st.button('Submit'):
                                 if 'user_type' not in st.session_state:
                                     st.session_state.user_type = user_type
 
-                                for user, idx in enumerate(user):
+                                for user, idx in enumerate(InfoManager().users):
                                     if f'{user}_pages' not in st.session_state:
                                         var_name = f"{user}_pages"
-                                        for page in Project:
-                                            var_name.append(page);
-                                        st.session_state.var_name = var_name
+                                        st.session_state.var_name = InfoManager.var_name
+                                        print(st.session_state.var_name)
                             else:
                                 st.error("Account not created succesfully :(")
                         else:

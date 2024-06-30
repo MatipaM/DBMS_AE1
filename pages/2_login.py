@@ -4,6 +4,7 @@ import os
 import server
 import sqlite3
 import requests
+from InfoManager import InfoManager
 
 # Function to add background image
 def add_bg_from_local(image_path):
@@ -94,6 +95,13 @@ if st.button('Login'):
 
         if 'user_type' not in st.session_state:
             st.session_state.user_type = affiliation
+
+        for idx, user in enumerate(InfoManager().users):
+            if f'{user}_pages' not in st.session_state:
+                var_name = f"{user}_pages"
+                print(var_name)
+                st.session_state.var_name = InfoManager.var_name
+                print(st.session_state.var_name)
     else:
         st.error(email_message)
 

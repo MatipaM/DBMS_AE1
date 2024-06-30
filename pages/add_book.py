@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from InfoManager import InfoManager
 # import server
 
 
@@ -33,5 +34,6 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
         display()
     else:
         st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
-else:
-    st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+# else:
+#     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+    
