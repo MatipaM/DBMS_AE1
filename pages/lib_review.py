@@ -10,7 +10,7 @@ def display():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT Pending_Request.title, Pending_Request.request_date, Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.affiliation, Pending_Request.email, Outstanding_Bills.amount FROM Pending_Request LEFT JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email LEFT JOIN Book_Records ON Book_Records.Email = Pending_Request.email;")
+    cursor.execute("SELECT DISTINCT Book_records.borrowed_date, Book_records.returned_date, Books.rating, Books.review, Outstanding_Bills.title, Outstanding_Bills.affiliation, Outstanding_Bills.email, Outstanding_Bills.date_request FROM Outstanding_Bills LEFT JOIN Book_records ON Outstanding_Bills.email = Book_records.email LEFT JOIN Books ON Book_records.id = Books.id")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -41,7 +41,7 @@ def display():
         conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Approved!")
+        st.write("You have approved the book request!")
 
     elif st.button("Disapprove"):
         disapproved_requests = df[df['Select'] == True]
@@ -63,14 +63,15 @@ def display():
                 reason += "You have unreturned books. "
             if outstanding_count > 0:
                 reason += "You have outstanding bills. "
+            if not row['Email'].endswith('@student.com'):
+                reason += "Your email does not end with @student.com. "
             # else:
             #     reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
-            
             reasons.append(reason)
         conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Disapproved!")
+        st.write("You have disapproved the book request!")
 
         #Students need to be notified
         st.session_state.disapproval_reasons = reasons
