@@ -107,6 +107,9 @@ user_type = email[email.index("@")+1: email.index(".com")]
 
 
 # check affiliation and email match
+Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage users","manager", "payment", "request book","return book","users sales"]
+
+users = ["librarian", "student", "staff", "admin"]
 
 if st.button('Submit'):
 # if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
@@ -136,6 +139,13 @@ if st.button('Submit'):
 
                                 if 'user_type' not in st.session_state:
                                     st.session_state.user_type = user_type
+
+                                for user, idx in enumerate(user):
+                                    if f'{user}_pages' not in st.session_state:
+                                        var_name = f"{user}_pages"
+                                        for page in Project:
+                                            var_name.append(page);
+                                        st.session_state.var_name = var_name
                             else:
                                 st.error("Account not created succesfully :(")
                         else:

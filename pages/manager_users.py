@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
 import streamlit as st
 import pandas  as pd
+from InfoManager import InfoManager
+
 st.title("Manage users")
 
 st.write("Authenticate Adminstrators")
@@ -13,49 +14,22 @@ Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage 
 column_headings = ["Pages user has access to", "Approve"]
 buttons = []
 
-# st.header("Adminstrators:")
-# for i in Project:
-#     new_select = st.checkbox(f"Select Administrators {i}");
-#     buttons.append(new_select);
-
-# df1 = pd.DataFrame({
-#     'Pages user has access to': Project,
-#     'Approve': buttons
-# })
-
-# st.header("Students:")
-# buttons = []
-# for i in Project:
-#     new_select = st.checkbox(f"Select Students {i}");
-#     buttons.append(new_select);
-
-# df2 = pd.DataFrame({
-#     'Pages user has access to': Project,
-#     'Approve': buttons
-# })
-
-# st.header("staff:")
-# buttons = []
-# for i in Project:
-#     new_select = st.checkbox(f"Select Staff {i}");
-#     buttons.append(new_select);
-
-# df3 = pd.DataFrame({
-#     'Pages user has access to': Project,
-#     'Approve': buttons
-# })
-
-
+info = InfoManager()
 
 positions = ["staff", "students", "administrator", "librarians"]
 for a in range(4):
+    pages_name = f"{positions[a]}_pages"
+    pages_name=[]
     st.header(positions[a])
     buttons=[]
-    for b in Project:
+    for b in info.project:
         new_select = st.checkbox(f"{positions[a]}: approve access to {b} page");
         buttons.append(new_select);
+        if new_select:
+            pages_name.append(f"{b} page")
 
-    df4 = pd.DataFrame({
+    pd.DataFrame({
         'Pages user has access to': Project,
         'Approve': buttons
-})
+    })
+    st.write(f"{positions[a]} has access to {pages_name}")
