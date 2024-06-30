@@ -16,8 +16,8 @@ if st.button("Submit"):
     st.write("Payment Successful! Thank you for your payment! You will be redirected to the home page shortly.")
     
     store = st.empty()
-    for i in range(5, 0, -1):
+    for i in range(3, 0, -1):
         store.write(f"Redirecting to the home page in {i} seconds...")
         time.sleep(1)
 
-    st.switch_page("pages/home.py")
+    st.switch_page("pages/payment_success.py")

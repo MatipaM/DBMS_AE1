@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from datetime import datetime
+import datetime
 import sqlite3
 import pandas as pd
 
@@ -8,7 +8,7 @@ st.title("Book Sales Section")
 
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
-cursor.execute("SELECT * FROM Sales")
+cursor.execute("SELECT * FROM Sales WHERE Date IS NULL")
 rows = cursor.fetchall()
 columns = [description[0] for description in cursor.description]
 
@@ -19,7 +19,7 @@ for row in rows:
         row[3] = 20
 
 if rows:
-    df = [(row[0], row[1], row[2], f'£{row[3]}') for row in rows]
+    df = [(row[0], row[1], row[2], f'£{row[3]}', row[4]) for row in rows]
     df = pd.DataFrame(df, columns=columns)
     df['Select'] = False
     df = st.data_editor(df, num_rows="dynamic")
@@ -31,14 +31,9 @@ if st.button("Purchase"):
 
     for index, row in purchased_books.iterrows():
         cursor.execute(
-            "DELETE FROM Sales WHERE SalesID = ? AND BookID = ? AND Year_Purchased = ? AND Price = ?",
-            (row['SalesID'], row['BookID'], row['Year_Purchased'], row['Price'])
+            "UPDATE Sales SET date = ? WHERE BookID = ?",
+            (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), row['BookID'])
         )
-        cursor.execute(
-            "INSERT INTO `Transaction` (SalesID, Date) VALUES (?, ?)",
-            (row['SalesID'], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        )
-
     conn.commit()
     conn.close()
 

@@ -80,13 +80,13 @@ def create_outstanding_bills():
         print(e)
 
 def create_sales_table():
-    sales_data = [
-        ("1234", "6894", "1990", 20),
-        ("2235", "7890", "1987", 19),
-        ("3345", "8890", "2001", 39),
-        ("1345", "8890", "2001", 39),
-        ("3115", "2239", "2002", 15),
-    ]
+    # sales_data = [
+    #     ("1234", "6894", "1990", 20),
+    #     ("2235", "7890", "1987", 19),
+    #     ("3345", "8890", "2001", 39),
+    #     ("1345", "8890", "2001", 39),
+    #     ("3115", "2239", "2002", 15),
+    # ]
     try:
         conn = connection()
         cursor = conn.cursor()
@@ -99,12 +99,11 @@ def create_sales_table():
                 Price INTEGER
             )
         ''')
+        cursor.execute('ALTER TABLE Sales ADD COLUMN date TEXT')
         conn.commit()
 
-        for data in sales_data:
-            cursor.execute('INSERT INTO Sales (BookID, SalesID, Year_Purchased, Price) VALUES (?, ?, ?, ?)', data)
-
-        conn.commit()
+        # for data in sales_data:
+        #     cursor.execute('INSERT INTO Sales (BookID, SalesID, Year_Purchased, Price) VALUES (?, ?, ?, ?)', data)
         cursor.close()
         conn.close()
         print("Sales table created successfully")
@@ -293,7 +292,7 @@ def return_book():
 
 @app.route('/crazy_sale', methods=['POST'])
 def save_sale():
-    sales_table()
+    #sales_table()
     print("I am trying to save the sales information")
     book_id = request.json.get('book_id')
     sales_id = request.json.get('sales_id')
@@ -325,5 +324,5 @@ create_user_table()
 
 if __name__ == '__main__':
     create_books()  # Call create_books() only if running this script directly
-    sales_table()   # Call sales_table() only if running this script directly
+    #sales_table()   # Call sales_table() only if running this script directly
     app.run(port=5000)
