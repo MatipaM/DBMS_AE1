@@ -12,6 +12,8 @@ def connection():
         print(e)
     return conn
 
+# def create_admin_auditing():
+
 def create_user_table():
     try:
         conn = sqlite3.connect('database.db')
