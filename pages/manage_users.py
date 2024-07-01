@@ -52,8 +52,6 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
             else:
                 st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
 else:
-    st.session_state.first_name = InfoManager().default_user["first_name"]
-    st.session_state.last_name = InfoManager().default_user["last_name"]
-    st.session_state.email = InfoManager().default_user["email"]
-    st.session_state.affiliation = InfoManager().default_user["affiliation"]
+    InfoManager().get_instance().loginDefault()
     display()
+

@@ -28,12 +28,18 @@ def display():
             st.error('Failed to submit books')
 
     if st.button("logout"):
-        for key in st.session_state.keys():
-            del st.session_state[key]
+        if st.session_state.first_name is not "default_first_name":
+            print("not default user")
+            for key in st.session_state.keys():
+                del st.session_state[key]
+                InfoManager().get_instance().loginDefault()
+                st.experimental_rerun()
 
 current_file_name = os.path.basename(__file__)
 
-if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+print(st.session_state.email, st.session_state.first_name);
+
+if st.session_state.email is not None and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
@@ -46,9 +52,6 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
             else:
                 st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
 else:
-    st.session_state.first_name = InfoManager().default_user["first_name"]
-    st.session_state.last_name = InfoManager().default_user["last_name"]
-    st.session_state.email = InfoManager().default_user["email"]
-    st.session_state.affiliation = InfoManager().default_user["affiliation"]
+    InfoManager().get_instance().loginDefault()
     display()
     

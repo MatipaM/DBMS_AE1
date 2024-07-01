@@ -34,3 +34,10 @@ class InfoManager():
             print("Connecting to the database.")
             cls.__instance = cls()
         return cls.__instance
+
+    @classmethod
+    def loginDefault(cls):
+        st.session_state.first_name = cls.default_user["first_name"]
+        st.session_state.last_name = cls.default_user["last_name"]
+        st.session_state.email = cls.default_user["email"]
+        st.session_state.affiliation = cls.default_user["affiliation"]
