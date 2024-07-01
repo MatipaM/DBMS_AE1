@@ -125,12 +125,12 @@ def create_pending_request():
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS Pending_Request (
-                email TEXT PRIMARY KEY  NOT NULL,
+                email TEXT NOT NULL,
                 date_request TEXT NOT NULL,
                 title TEXT NOT NULL,
                 interest TEXT NOT NULL,
                 affiliation TEXT NOT NULL,
-                id TEXT NOT NULL 
+                id TEXT PRIMARY KEY NOT NULL 
             )
         ''')
         conn.commit()

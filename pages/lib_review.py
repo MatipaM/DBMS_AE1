@@ -24,11 +24,23 @@ def display():
         df = pd.DataFrame(rows, columns=columns)
         df['Select'] = False
         df = st.data_editor(df, num_rows="dynamic")
-    else:
-        st.write("No Book Requests.")
+    # else:
+    #     st.write("No Book Requests.")
+
+    approve_btn = ""
+    disaprove_btn = ""
+
+
+    try:
+        df[df['Select'] ==True]
+        approve_btn = st.button("Approve")
+        disaprove_btn = st.button("Disapprove")
+    except UnboundLocalError:
+       approve_btn = st.write("There are no requests to approve")
+       disaprove_btn = st.write("There are no requests to disapprove")
 
     # Approve or Disapprove Button
-    if st.button("Approve"):
+    if approve_btn:
         approved_requests = df[df['Select'] == True]
 
         for index, row in approved_requests.iterrows():
@@ -46,7 +58,7 @@ def display():
         df.drop(columns=['Select'], inplace=True)
         st.write("You have approved the book request!")
 
-    elif st.button("Disapprove"):
+    elif disaprove_btn:
         disapproved_requests = df[df['Select'] == True]
         reasons = []
         for index, row in disapproved_requests.iterrows():
