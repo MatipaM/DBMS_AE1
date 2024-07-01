@@ -10,11 +10,11 @@ def display():
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     st.title("Book Sales Section")
 
-conn = sqlite3.connect('database.db')
-cursor = conn.cursor()
-cursor.execute("SELECT * FROM Sales s LEFT JOIN Books b ON s.BookID = b.id WHERE Date IS NULL")
-rows = cursor.fetchall()
-columns = [description[0] for description in cursor.description]
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Sales s LEFT JOIN Books b ON s.BookID = b.id WHERE Date IS NULL")
+    rows = cursor.fetchall()
+    columns = [description[0] for description in cursor.description]
 
     #this is probably a stupid way to do it but it works, anyways please make it better if you can
     rows = [list(row) for row in rows]

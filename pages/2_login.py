@@ -88,18 +88,16 @@ if st.button('Login'):
         st.session_state.first_name = first_name.capitalize()
         st.session_state.last_name = last_name.capitalize()
         st.session_state.user_type = affiliation
-    
-        if email.endswith('@student.com'):
-            st.switch_page("pages/home.py")
-        elif email.endswith('@librarian.com'):
-            st.switch_page("pages/lib_review.py")
         st.session_state.affiliation = affiliation
 
         for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
             if user_page_array not in st.session_state:
                 st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
                 print(st.session_state.user_page_array)
+
+        if affiliation == "librarian":
+            st.switch_page("pages/lib_review.py")
+        elif affiliation == "student" or affiliation == "staff":
+            st.switch_page("pages/home.py")
     else:
         st.error(email_message)
-
- 

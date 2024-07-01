@@ -4,8 +4,10 @@ import pandas as pd
 import requests
 import datetime
 import server
+import os
 
 def display():
+    st.title("Book Borrow Section")
     st.write("Here are the books available for borrowing:")
 
     conn = sqlite3.connect('database.db')
@@ -53,26 +55,27 @@ def display():
             else:
                 st.error('Failed to submit books')
 
-    InfoManager().get_instance().logout()
+    # InfoManager().get_instance().logout()
 
-current_file_name = os.path.basename(__file__)
+display()
+# current_file_name = os.path.basename(__file__)
 
 
-if hasattr(st.session_state, "first_name"):
-    email = st.session_state.email
-    first_name = st.session_state.first_name
-    last_name = st.session_state.last_name
-    affiliation = st.session_state.affiliation
+# if hasattr(st.session_state, "first_name"):
+#     email = st.session_state.email
+#     first_name = st.session_state.first_name
+#     last_name = st.session_state.last_name
+#     affiliation = st.session_state.affiliation
 
-    for idx,i in enumerate(InfoManager().get_instance().users):
-        if st.session_state.affiliation == i:
-            print("affiliation", st.session_state.affiliation)
-            print(current_file_name, InfoManager().get_instance().getPages(idx))
-            if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
-                display()
-            else:
-                st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
-                InfoManager().get_instance().logout()
-else:
-    InfoManager().get_instance().loginDefault()
-    display()
+#     for idx,i in enumerate(InfoManager().get_instance().users):
+#         if st.session_state.affiliation == i:
+#             print("affiliation", st.session_state.affiliation)
+#             print(current_file_name, InfoManager().get_instance().getPages(idx))
+#             if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
+#                 display()
+#             else:
+#                 st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
+#                 InfoManager().get_instance().logout()
+# else:
+#     InfoManager().get_instance().loginDefault()
+#     display()
