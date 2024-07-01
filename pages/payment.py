@@ -1,5 +1,7 @@
 import streamlit as st
 import time
+import os
+from InfoManager import InfoManager
 
 #This is just a visual page, no functionality at all, just for end to end presentation
 
@@ -21,3 +23,24 @@ if st.button("Submit"):
         time.sleep(1)
 
     st.switch_page("pages/home.py")
+
+current_file_name = os.path.basename(__file__)
+
+if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+    email = st.session_state.email
+    first_name = st.session_state.first_name
+    last_name = st.session_state.last_name
+
+    for idx,i in enumerate(InfoManager().get_instance().users):
+        if st.session_state.affiliation == i:
+            print(current_file_name[:-3], InfoManager().get_instance().getPages(idx))
+            if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
+                display()
+            else:
+                st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
+else:
+    st.session_state.first_name = InfoManager().default_user["first_name"]
+    st.session_state.last_name = InfoManager().default_user["last_name"]
+    st.session_state.email = InfoManager().default_user["email"]
+    st.session_state.affiliation = InfoManager().default_user["affiliation"]
+    display()

@@ -28,17 +28,15 @@ def display():
             st.error('Failed to submit books')
 
 current_file_name = os.path.basename(__file__)
-print("current_file_name: ",current_file_name)
 
 if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
 
-    for idx,i in enumerate(InfoManager().users):
+    for idx,i in enumerate(InfoManager().get_instance().users):
         if st.session_state.affiliation == i:
-            print(current_file_name)
-            if current_file_name in InfoManager().user_pages_arrays[idx]:
+            if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
                 display()
             else:
                 st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
@@ -47,5 +45,5 @@ else:
     st.session_state.last_name = InfoManager().default_user["last_name"]
     st.session_state.email = InfoManager().default_user["email"]
     st.session_state.affiliation = InfoManager().default_user["affiliation"]
-    display() #fill st.sessionstate with default user
+    display()
     

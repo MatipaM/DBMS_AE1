@@ -100,9 +100,9 @@ if st.button('Login'):
         if 'affiliation' not in st.session_state:
             st.session_state.affiliation = affiliation
 
-        for idx, user_page_array in enumerate(InfoManager().user_pages_arrays):
+        for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
             if user_page_array not in st.session_state:
-                st.session_state.user_page_array = user_page_array
+                st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
                 print(st.session_state.user_page_array)
     else:
         st.error(email_message)
