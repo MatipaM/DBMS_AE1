@@ -4,6 +4,7 @@ import os
 import server
 import sqlite3
 import requests
+from InfoManager import InfoManager
 
 # Function to add background image
 def add_bg_from_local(image_path):
@@ -83,21 +84,22 @@ if st.button('Login'):
     userExists, email_message, first_name, last_name, affiliation = user_exists() #if user exsists and password correct
     if userExists:
         st.success('Logged in successfully!')
-        if 'email' not in st.session_state:
-            st.session_state.email = email
-                                
-        if 'first_name' not in st.session_state:
-            st.session_state.first_name = first_name.capitalize()
-
-        if 'last_name' not in st.session_state:
-            st.session_state.last_name = last_name.capitalize()
-
-        if 'user_type' not in st.session_state:
-            st.session_state.user_type = affiliation
+        st.session_state.email = email
+        st.session_state.first_name = first_name.capitalize()
+        st.session_state.last_name = last_name.capitalize()
+        st.session_state.user_type = affiliation
     
         if email.endswith('@student.com'):
             st.switch_page("pages/home.py")
         elif email.endswith('@librarian.com'):
             st.switch_page("pages/lib_review.py")
+        st.session_state.affiliation = affiliation
+
+        for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
+            if user_page_array not in st.session_state:
+                st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
+                print(st.session_state.user_page_array)
     else:
         st.error(email_message)
+
+ 

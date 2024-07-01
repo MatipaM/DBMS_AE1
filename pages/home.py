@@ -2,6 +2,8 @@ import streamlit as st
 import server
 import sqlite3
 import pandas as pd
+import os
+from InfoManager import InfoManager
 
 def display():
     st.title(f"{first_name} {last_name}'s Home Page")
@@ -30,7 +32,9 @@ def display():
      
     conn.close()
 
-if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+current_file_name = os.path.basename(__file__)
+
+if hasattr(st.session_state, "first_name"):
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name

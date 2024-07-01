@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 from string import punctuation
-import server
 import sqlite3
+import server
+from InfoManager import InfoManager
 #import phonenumbers
 
 st.title("Registration Page")
@@ -106,7 +107,10 @@ address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
 
-print(affiliation)
+# check affiliation and email match
+Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage users","manager", "payment", "request book","return book","users sales"]
+
+users = ["librarian", "student", "staff", "admin"]
 
 if st.button('Submit'):
 # if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
@@ -136,6 +140,15 @@ if st.button('Submit'):
 
                                 if 'user_type' not in st.session_state:
                                     st.session_state.user_type = user_type
+
+                                if 'affiliation' not in st.session_state:
+                                    st.session_state.affiliation = affiliation
+
+                             
+                                for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
+                                    if user_page_array not in st.session_state:
+                                        st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
+                                        print(st.session_state.user_page_array)
                             else:
                                 st.error("Account not created succesfully :(")
                         else:

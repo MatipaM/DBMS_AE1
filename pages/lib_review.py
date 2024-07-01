@@ -2,11 +2,14 @@ import sqlite3
 import pandas as pd
 import streamlit as st
 import pandas as pd
+import os
+from InfoManager import InfoManager
 
 # Librarian Book Request Review
 # 3 conditions: Returned all books AND paid outstanding bills, 
 
 def display():
+    st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
