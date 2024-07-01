@@ -55,6 +55,10 @@ def display():
     with col2:
         if st.button('Back to Home Page'):
             st.switch_page("pages/lib_review.py")
+    
+    InfoManager().get_instance().logout()
+
+current_file_name = os.path.basename(__file__)
 
 if hasattr(st.session_state, "first_name"):
     email = st.session_state.email
