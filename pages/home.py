@@ -24,7 +24,14 @@ def display():
         st.write("Please wait for a confirmation from the Librarian. Thank you!")
     else:
         st.write("You currently do not have any book requests.")
-     
+
+    if st.button("logout"):
+        if st.session_state.first_name is not "default_first_name":
+            print("not default user")
+            for key in st.session_state.keys():
+                del st.session_state[key]
+                InfoManager().get_instance().loginDefault()
+                st.experimental_rerun()
 
     conn.close()
 

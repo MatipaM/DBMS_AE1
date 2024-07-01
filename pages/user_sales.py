@@ -50,6 +50,14 @@ def display():
 
         df = df[df['Select'] == False]
 
+    if st.button("logout"):
+        if st.session_state.first_name is not "default_first_name":
+            print("not default user")
+            for key in st.session_state.keys():
+                del st.session_state[key]
+                InfoManager().get_instance().loginDefault()
+                st.experimental_rerun()
+
 current_file_name = os.path.basename(__file__)
 
 if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
