@@ -94,6 +94,10 @@ if st.button('Login'):
             if user_page_array not in st.session_state:
                 st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
                 print(st.session_state.user_page_array)
+
+        if affiliation == "librarian":
+            st.switch_page("pages/lib_review.py")
+        elif affiliation == "student" or affiliation == "staff":
+            st.switch_page("pages/home.py")
     else:
         st.error(email_message)
-
