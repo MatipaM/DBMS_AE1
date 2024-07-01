@@ -42,3 +42,23 @@ if 'disapproval_reasons' in st.session_state:
     reasons = st.session_state.disapproval_reasons
     for reason in reasons:
         st.write(reason)
+
+if 'approval_message' in st.session_state:
+    st.write(st.session_state.approval_message)
+
+    st.write("Please choose how you would like to receive your book:")
+    choice = st.radio("Choose an option", ["Pick Up", "Posted"])
+    token_amount = st.number_input("Enter the token amount", min_value=0, step=1)
+
+    if st.button("Submit"):
+        if token_amount > 0:
+            st.session_state.approval_message = f"You have chosen {choice} and paid a token of {token_amount}."
+            if choice == "Posted":
+                st.session_state.approval_message += " Your book will be posted to you in 2 days. Thank you!"
+            elif choice == "Pick Up":
+                st.session_state.approval_message += " Your book will be ready for pick up tomorrow 9am. Thank you!"
+        else:
+            st.session_state.approval_message = f"You have chosen {choice} but did not pay the token."
+
+        st.experimental_rerun()
+    
