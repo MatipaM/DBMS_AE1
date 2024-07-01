@@ -55,6 +55,15 @@ def create_books():
                     rating INTEGER NOT NULL,
                     review TEXT,
                     price INTEGER NOT NULL)''')
+        # books = [
+        #     ('The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', '2024', '1925', 'A novel set in the Jazz Age', 'None', '1st', 10, 5, 5, 'Excellent', 10),
+        #     ('1984', 'George Orwell', 'Secker & Warburg', '2024', '1949', 'A dystopian social science fiction novel', 'None', '1st', 15, 7, 4, 'Thought-provoking', 15),
+        #     ('To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', '2024', '1960', 'A novel about racial injustice', 'None', '1st', 20, 10, 5, 'Timeless classic', 20)
+        # ]
+
+        # cursor.executemany('''INSERT INTO Books 
+        #                       (title, author, publisher, year_purchased, year_published, description, secondary_title, version, quantity, available, rating, review, price) 
+        #                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', books)
         conn.commit()
         cursor.close()
         conn.close()
@@ -241,29 +250,50 @@ def save_user():
 
 @app.route('/crazy_borrow', methods=['POST'])
 def borrow_book():
-    create_pending_request()
-    print("I am trying to save the pending request's information")
-    email = request.json.get('email')
-    date_request = request.json.get('date_request')
-    title = request.json.get('title')
-    interest = request.json.get('interest')
-    affiliation = request.json.get('affiliation')
-    id = request.json.get('id')
-
-    if not email or not date_request or not title or not interest or not affiliation or not email or not id:
-        return jsonify({'error': 'No data provided'}), 400
-
     try:
+        data = request.get_json(force=True)
+        print("Received data:", data)
+        print("Data type:", type(data))
+        print("Email:", data.get('email'))
+        print("Date request:", data.get('date_request'))
+        print("Books:", data.get('books'))
+        
+        email = data.get('email')
+        date_request = data.get('date_request')
+        books = data.get('books')
+        
+
+        if not email or not date_request:
+            print("Missing data fields:", {"email": email, "date_request": date_request, "books": books})
+            return jsonify({'error': 'No data provided'}), 400
+
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO pending_request (email, date_request, title, interest, affiliation, id) VALUES (?, ?, ?, ?, ?, ?)', (email, date_request, title, interest, affiliation, id))
-        connect.commit()
-        cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
+
+        for book in books:
+            title = book.get('title')
+            interest = book.get('interest')
+            affiliation = email.split('@')[1].split('.')[0]
+            book_id = str(book.get('id'))  # Convert to string!!!! Thsi caused me headache!!!
+            if not all([title, interest, book_id]):
+                return jsonify({'error': f'Missing data for book: {book}'}), 400
+            cursor.execute('INSERT INTO Pending_Request (email, date_request, title, interest, affiliation, id) VALUES (?, ?, ?, ?, ?, ?)', 
+                        (email, date_request, title, interest, affiliation, book_id))
+            connect.commit()
+            cursor.close()
+            connect.close()
+
+            return jsonify({'message': 'Data saved'}), 201
+    except sqlite3.Error as e:
+        print("SQLite error:", e)
+        if connect:
+            connect.rollback()
+        return jsonify({'error': 'Database error'}), 500
+    except Exception as e:
+        print("Other error:", e)
+        if connect:
+            connect.rollback()
+        return jsonify({'error': 'Error processing request'}), 500
 
 @app.route('/crazy_return', methods=['POST'])
 def return_book():
