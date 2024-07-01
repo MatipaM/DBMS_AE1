@@ -41,3 +41,17 @@ class InfoManager():
         st.session_state.last_name = cls.default_user["last_name"]
         st.session_state.email = cls.default_user["email"]
         st.session_state.affiliation = cls.default_user["affiliation"]
+
+    @staticmethod
+    def logout():
+        if st.session_state.first_name is not "default_first_name":
+            if st.button("logout"):
+                print("not default user")
+                for key in st.session_state.keys():
+                    del st.session_state[key]
+                    InfoManager().get_instance().loginDefault()
+                    logout_btn = st.button("login")
+                    st.experimental_rerun()
+        elif st.button("login"):
+            st.switch_page("pages/2_login.py")
+                    

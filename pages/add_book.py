@@ -4,7 +4,6 @@ from InfoManager import InfoManager
 import os
 # import server
 
-
 def display():
     # server.create_books() 
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
@@ -27,22 +26,15 @@ def display():
         else:
             st.error('Failed to submit books')
 
-    if st.button("logout"):
-        if st.session_state.first_name is not "default_first_name":
-            print("not default user")
-            for key in st.session_state.keys():
-                del st.session_state[key]
-                InfoManager().get_instance().loginDefault()
-                st.experimental_rerun()
+    InfoManager().get_instance().logout()
 
 current_file_name = os.path.basename(__file__)
 
-# print(st.session_state.email, st.session_state.first_name);
-
-if st.session_state.email is not None and 'first_name' in st.session_state and 'last_name' in st.session_state:
+if hasattr(st.session_state, "first_name"):
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
+    affiliation = st.session_state.affiliation
 
     for idx,i in enumerate(InfoManager().get_instance().users):
         if st.session_state.affiliation == i:
@@ -51,8 +43,10 @@ if st.session_state.email is not None and 'first_name' in st.session_state and '
             if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
                 display()
             else:
-                st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
+                st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
+                InfoManager().get_instance().logout()
 else:
     InfoManager().get_instance().loginDefault()
     display()
+
     
