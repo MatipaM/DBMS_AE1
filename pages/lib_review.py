@@ -10,7 +10,7 @@ def display():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT DISTINCT Book_records.borrowed_date, Book_records.returned_date, Books.rating, Books.review, Outstanding_Bills.title, Outstanding_Bills.affiliation, Outstanding_Bills.email, Outstanding_Bills.date_request FROM Outstanding_Bills LEFT JOIN Book_records ON Outstanding_Bills.email = Book_records.email LEFT JOIN Books ON Book_records.id = Books.id")
+    cursor.execute("SELECT pr.id, pr.email, pr.date_request, pr.title, pr.interest, pr.affiliation, b.author, b.publisher, b.year_purchased, b.year_published, b.description, b.secondary_title, b.version, b.quantity, b.available, b.rating, b.review, b.price, ob.email AS ob_email, ob.price AS ob_price FROM Pending_Request pr LEFT JOIN Books b ON pr.title = b.title LEFT JOIN Outstanding_Bills ob ON pr.email = ob.email;")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -33,20 +33,15 @@ def display():
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_records (id, borrowed_date, email, returned_date, rating, review) VALUES (?, ?, ?, NULL, NULL, NULL)",
-                (row['id'], row['Request_Date'], row['Email'])
+                "INSERT INTO Book_records (id, borrowed_date, returned_date, email) VALUES (?, ?, NULL, ?)",
+                (row['id'], row['date_request'], row['email'])
             )
-
-            # cursor.execute(
-            #     update books to include rating, review where book_records.id == book.id
-            # )
 
             cursor.execute(
                 "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
-                (row['Title'], row['Email'], row['Request_Date'])
+                (row['title'], row['email'], row['date_request'])
             )
         conn.commit()
-        conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
         st.write("You have approved the book request!")
@@ -57,24 +52,22 @@ def display():
         for index, row in disapproved_requests.iterrows():
             cursor.execute(
                 "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
-                (row['Title'], row['Email'], row['Request_Date'])
+                (row['title'], row['email'], row['date_request'])
             )
             conn.commit()
             cursor.execute("SELECT COUNT(*) FROM Book_records WHERE returned_date IS NULL")
             unreturned_count = cursor.fetchone()[0]
             
-            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE email = ?", (row['Email'],))
+            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE email = ?", (row['email'],))
             outstanding_count = cursor.fetchone()[0]
             
-            reason = f"Request for {row['Title']} by {row['Email']} disapproved because: "
+            reason = f"Request for {row['title']} by {row['email']} disapproved because: "
             if unreturned_count > 0:
                 reason += "You have unreturned books. "
             if outstanding_count > 0:
                 reason += "You have outstanding bills. "
-            if not row['Email'].endswith('@student.com'):
+            if not row['email'].endswith('@student.com'):
                 reason += "Your email does not end with @student.com. "
-            # else:
-            #     reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
             reasons.append(reason)
         conn.close()
         df = df[df['Select'] == False]

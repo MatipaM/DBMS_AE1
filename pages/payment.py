@@ -13,7 +13,7 @@ expiry_date = st.date_input("Expiry Date")
 cvv = st.text_input("CVV")
 
 if st.button("Submit"):
-    st.write("Payment Successful! Thank you for your payment! You will be redirected to the home page shortly.")
+    st.write("You will be redirected to the home page shortly.")
     
     store = st.empty()
     for i in range(3, 0, -1):
