@@ -37,7 +37,7 @@ def display():
 
 current_file_name = os.path.basename(__file__)
 
-print(st.session_state.email, st.session_state.first_name);
+# print(st.session_state.email, st.session_state.first_name);
 
 if st.session_state.email is not None and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
@@ -46,6 +46,7 @@ if st.session_state.email is not None and 'first_name' in st.session_state and '
 
     for idx,i in enumerate(InfoManager().get_instance().users):
         if st.session_state.affiliation == i:
+            print("affiliation", st.session_state.affiliation)
             print(current_file_name, InfoManager().get_instance().getPages(idx))
             if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
                 display()
