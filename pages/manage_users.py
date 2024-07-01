@@ -24,9 +24,10 @@ def display():
             new_select = st.checkbox(f"{InfoManager().get_instance().users[a]}: approve access to {b} page", value=any(b in page for page in InfoManager().get_instance().getPages(a)));
             buttons.append(new_select);
             if new_select:
-                pages_name.append(f"{b} page")
+                pages_name.append(f"{b}")
 
 
+        print("pages_name", pages_name)
         InfoManager().user_pages_arrays[a] = pages_name
 
         pd.DataFrame({

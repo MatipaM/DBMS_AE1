@@ -27,6 +27,10 @@ def display():
         else:
             st.error('Failed to submit books')
 
+    if st.button("logout"):
+        for key in st.session_state.keys():
+            del st.session_state[key]
+
 current_file_name = os.path.basename(__file__)
 
 if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
@@ -36,6 +40,7 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
 
     for idx,i in enumerate(InfoManager().get_instance().users):
         if st.session_state.affiliation == i:
+            print(current_file_name, InfoManager().get_instance().getPages(idx))
             if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
                 display()
             else:
