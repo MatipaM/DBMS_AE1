@@ -297,28 +297,52 @@ def borrow_book():
 
 @app.route('/crazy_return', methods=['POST'])
 def return_book():
-    create_book_records()
-    print("I am trying to save the book records's information")
-    borrowed_date = request.json.get('borrowed_date')
-    returned_date = request.json.get('returned_date')
-    email = request.json.get('email')
-    id = request.json.get('id')
+    data = request.get_json(force=True)
+    print(f"Processed data: {data}")
 
-    if not email or not borrowed_date or not returned_date or not id: 
-        return jsonify({'error': 'No data provided'}), 400
+    email = data.get('email')
+    title = data.get('title')
+    returned_date = data.get('returned_date')
+    rating = data.get('rating')
+    review = data.get('review')
+
+    if not email or not title or not returned_date or not rating or not review:
+        return jsonify({'error': 'Missing required data'}), 400
 
     try:
-        connect = connection()
-        cursor = connect.cursor()
-        cursor.execute('INSERT INTO book_records (email, borrowed_date, returned_date, id) VALUES (?, ?, ?, ?, ?, ?)', (email, borrowed_date, returned_date, id))
-        connect.commit()
+        conn = connection()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT id FROM Books WHERE title = ?', (title,))
+        book_id_result = cursor.fetchone()
+        if not book_id_result:
+            return jsonify({'error': 'Book not found'}), 404
+        book_id = book_id_result[0]
+
+        cursor.execute('''
+            UPDATE Book_records
+            SET returned_date = ?
+            WHERE email = ? AND id = ? AND returned_date IS NULL
+        ''', (returned_date, email, book_id))
+
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'No matching borrowed book found or book already returned'}), 404
+
+        cursor.execute('''
+            UPDATE Books
+            SET rating = ?, review = ?, available = available + 1
+            WHERE id = ?
+        ''', (rating, review, book_id))
+
+        conn.commit()
         cursor.close()
-        connect.close()
-        return jsonify({'message': 'Data saved'}), 201
-    except Error as e:
-        print(e)
-        return jsonify({'error': 'Error saving data'}), 500
-    pass
+        conn.close()
+
+        return jsonify({'message': 'Book returned successfully'}), 201
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': 'Error updating data'}), 500
 
 @app.route('/crazy_sale', methods=['POST'])
 def save_sale():
