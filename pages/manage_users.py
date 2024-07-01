@@ -24,6 +24,8 @@ for a in range(4):
         if new_select:
             pages_name.append(f"{b} page")
 
+    InfoManager().user_pages_arrays[a] = pages_name
+
     pd.DataFrame({
         'Pages user has access to': InfoManager().project,
         'Approve': buttons

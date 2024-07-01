@@ -1,8 +1,8 @@
 import streamlit as st
 import requests
 from string import punctuation
-import server
 import sqlite3
+import server
 from InfoManager import InfoManager
 #import phonenumbers
 
@@ -141,11 +141,13 @@ if st.button('Submit'):
                                 if 'user_type' not in st.session_state:
                                     st.session_state.user_type = user_type
 
-                                for user, idx in enumerate(InfoManager().users):
-                                    if f'{user}_pages' not in st.session_state:
-                                        var_name = f"{user}_pages"
-                                        st.session_state.var_name = InfoManager.var_name
-                                        print(st.session_state.var_name)
+                                if 'affiliation' not in st.session_state:
+                                    st.session_state.affiliation = affiliation
+
+                                for idx, user_page_array in enumerate(InfoManager().user_pages_arrays):
+                                    if user_page_array not in st.session_state:
+                                        st.session_state.user_page_array = InfoManager.user_page_array
+                                        print(st.session_state.user_page_array)
                             else:
                                 st.error("Account not created succesfully :(")
                         else:

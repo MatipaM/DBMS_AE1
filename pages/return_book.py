@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from datetime import datetime
+from InfoManager import InfoManager
+import os
 
 # Book Return Page
 def display():
@@ -23,13 +25,24 @@ def display():
         else:
             st.error('Failed to return book')
 
-if 'first_name' in st.session_state and 'last_name' in st.session_state and 'email' in st.session_state and 'user_type' in st.session_state:
+current_file_name = os.path.basename(__file__)
+
+if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+    email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
-    email = st.session_state.email
-    affiliation = st.session_state.user_type
-    st.header(f"Welcome, {first_name} {last_name}!")
-    display()
+
+    for idx,i in enumerate(InfoManager().users):
+        if st.session_state.affiliation == i:
+            print(current_file_name)
+            if current_file_name in InfoManager().user_pages_arrays[idx]:
+                display()
+            else:
+                st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
 else:
-    st.write("<a href='registration'>Please sign in to view this page</a>", unsafe_allow_html=True)
+    st.session_state.first_name = InfoManager().default_user["first_name"]
+    st.session_state.last_name = InfoManager().default_user["last_name"]
+    st.session_state.email = InfoManager().default_user["email"]
+    st.session_state.affiliation = InfoManager().default_user["affiliation"]
+    display()
 

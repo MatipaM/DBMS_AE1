@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from InfoManager import InfoManager
+import os
 # import server
 
 
@@ -26,14 +27,25 @@ def display():
         else:
             st.error('Failed to submit books')
 
+current_file_name = os.path.basename(__file__)
+print("current_file_name: ",current_file_name)
+
 if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
-    if "librarian" in email:
-        display()
-    else:
-        st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
-# else:
-#     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+
+    for idx,i in enumerate(InfoManager().users):
+        if st.session_state.affiliation == i:
+            print(current_file_name)
+            if current_file_name in InfoManager().user_pages_arrays[idx]:
+                display()
+            else:
+                st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
+else:
+    st.session_state.first_name = InfoManager().default_user["first_name"]
+    st.session_state.last_name = InfoManager().default_user["last_name"]
+    st.session_state.email = InfoManager().default_user["email"]
+    st.session_state.affiliation = InfoManager().default_user["affiliation"]
+    display() #fill st.sessionstate with default user
     

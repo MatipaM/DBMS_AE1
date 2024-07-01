@@ -116,5 +116,7 @@ if "email" in st.session_state and 'first_name' in st.session_state and 'last_na
         display()
     else:
         st.error(f"{first_name} {last_name}, you're {email} is not authorised to access this page.")
+
+    
 else:
     st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
