@@ -56,13 +56,21 @@ def display():
         if st.button('Back to Home Page'):
             st.switch_page("pages/lib_review.py")
 
-if "email" in st.session_state and 'first_name' in st.session_state and 'last_name' in st.session_state:
+if hasattr(st.session_state, "first_name"):
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
-    if email.endswith('@librarian.com'):
-        display()
-    else:
-        st.error(f"{first_name} {last_name}, you are not authorised to view this page.")
+    affiliation = st.session_state.affiliation
+
+    for idx,i in enumerate(InfoManager().get_instance().users):
+        if st.session_state.affiliation == i:
+            print("affiliation", st.session_state.affiliation)
+            print(current_file_name, InfoManager().get_instance().getPages(idx))
+            if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
+                display()
+            else:
+                st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
+                InfoManager().get_instance().logout()
 else:
-    st.write("<a href='registration'>Please sign in</a>", unsafe_allow_html=True)
+    InfoManager().get_instance().loginDefault()
+    display()
