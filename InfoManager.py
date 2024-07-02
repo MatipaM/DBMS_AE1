@@ -44,7 +44,7 @@ class InfoManager():
 
     @staticmethod
     def logout():
-        if st.session_state.first_name is not "default_first_name":
+        if st.session_state.first_name != "default_first_name":
             if st.button("logout"):
                 print("not default user")
                 for key in st.session_state.keys():
