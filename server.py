@@ -12,7 +12,24 @@ def connection():
         print(e)
     return conn
 
-# def create_admin_auditing():
+def create_admin_auditing():
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS Admin_Auditing (
+                email text PRIMARY KEY AUTOINCREMENT,
+                approved_date TEXT NOT NULL,
+                approved_admin_email TEXT NOT NULL,
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("Admin auditing table created successfully")
+    except Error as e:
+        print(e)
+
 
 def create_user_table():
     try:
@@ -136,6 +153,13 @@ def save_sale():
     except Error as e:
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
+    
+# @app.route('/crazy_admin', methods=['POST'])
+# def save_admin_auditing():
+#       CREATE TABLE IF NOT EXISTS Admin_Auditing (
+#                 email text PRIMARY KEY AUTOINCREMENT,
+#                 approved_date TEXT NOT NULL,
+#                 approved_admin_email TEXT NOT NULL,
 
 if __name__ == '__main__':
     create_books()  # Call create_books() only if running this script directly
