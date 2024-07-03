@@ -33,20 +33,25 @@ def display():
     df['Select'] = False
     table = st.data_editor(df, num_rows="dynamic")
 
+    st.write(df[df['Select'] == True])
+
     if st.button("Approve"):
         approved_requests = df[df['Select'] == True]
 
-        for index, row in approved_requests.iterrows():
+        for index,row in approved_requests.iterrows():
+            print(index,row)
             cursor.execute(
                 "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
                 (datetime.now().date(), st.session_state.email, "True", row['Email'])
             )
 
+            print(f"Updating: {row['Email']}")
+            
 
         conn.commit()
         conn.close()
-        df = df[df['Select'] == False]
-        df.drop(columns=['Select'], inplace=True)
+        # df = df[df['Select'] == False]
+        # df.drop(columns=['Select'], inplace=True)
         st.write("Approved!")
     elif st.button("Disapprove"):
         approved_requests = df[df['Select'] == True]
@@ -79,8 +84,6 @@ def display():
             if new_select:
                 pages_name.append(f"{b}")
 
-
-        print("pages_name", pages_name)
         InfoManager().user_pages_arrays[a] = pages_name
 
         pd.DataFrame({
