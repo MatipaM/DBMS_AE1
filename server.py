@@ -148,7 +148,7 @@ def create_book_records():
             CREATE TABLE IF NOT EXISTS Book_records (
                 id TEXT PRIMARY KEY  NOT NULL,
                 borrowed_date TEXT NOT NULL,
-                returned_date TEXT NOT NULL,
+                returned_date TEXT,
                 email TEXT NOT NULL
             )
         ''')
