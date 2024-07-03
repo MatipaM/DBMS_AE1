@@ -20,7 +20,8 @@ def create_admin_audit():
             CREATE TABLE IF NOT EXISTS Admin_Auditing (
                 email text PRIMARY KEY,
                 approved_date TEXT,
-                approved_admin_email TEXT
+                approved_admin_email TEXT,
+                approved_status TEXT
             )
         ''')
         conn.commit()
@@ -184,6 +185,7 @@ def save_admin_audit():
     email = request.json.get('email')
     approved_date = request.json.get('approved_date')
     approved_admin_email = request.json.get('approved_admin_email')
+    approved_status = request.json.get('approved_status')
 
     if not email or not approved_date or not approved_admin_email:
         return jsonify({'error': 'No data provided'}), 400
@@ -191,7 +193,7 @@ def save_admin_audit():
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email) VALUES (?, ?, ?)', (email, approved_date, approved_admin_email))
+        cursor.execute('INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email, approved_status) VALUES (?, ?, ?, ?)', (email, approved_date, approved_admin_email, approved_status))
         connect.commit()
         cursor.close()
         connect.close()

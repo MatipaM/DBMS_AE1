@@ -3,20 +3,65 @@ import pandas  as pd
 from InfoManager import InfoManager
 import os
 import sqlite3
+from datetime import datetime
 
 def display():
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     st.title("Manage users")
 
-    st.write("Authenticate Adminstrators")
+    st.write("Authenticate Adminstrators:")
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute('''SELECT distinct Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount 
-                   FROM Pending_Request 
-                   left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email''')
 
+    # cursor.execute('''SELECT distinct Admin_Auditing.email as AdminEmail, User.first_name, User.last_name, User.affiliation
+    #                FROM Admin_Auditing 
+    #                JOIN User ON Admin_Auditing.Email = User.email 
+    #                 ''')
+
+    cursor.execute('''SELECT distinct User.email, first_name, last_name, affiliation, Admin_Auditing.approved_status
+                   FROM User 
+                   join Admin_Auditing on Admin_Auditing.email = User.email
+                   Where User.email = Admin_Auditing.Email and Admin_Auditing.approved_status='False'
+                    ''')
+
+    columns = ['Email', 'First name', 'Last Name', 'Affiliation', 'Approved Status']
+
+    rows = cursor.fetchall()
+
+    df = pd.DataFrame(rows, columns=columns)
+    df['Select'] = False
+    table = st.data_editor(df, num_rows="dynamic")
+
+    if st.button("Approve"):
+        approved_requests = df[df['Select'] == True]
+
+        for index, row in approved_requests.iterrows():
+            cursor.execute(
+            "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
+            (datetime.now().date(), st.session_state.email, "True", row['Email'])
+        )
+
+
+        conn.commit()
+        conn.close()
+        df = df[df['Select'] == False]
+        df.drop(columns=['Select'], inplace=True)
+        st.write("Approved!")
+    elif st.button("Disapprove"):
+        approved_requests = df[df['Select'] == True]
+
+        for index, row in approved_requests.iterrows():
+            cursor.execute(
+            "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
+            (datetime.now().date(), st.session_state.email, "False", row['Email'])
+        )
+
+        conn.commit()
+        conn.close()
+        df = df[df['Select'] == False]
+        df.drop(columns=['Select'], inplace=True)
+        st.write("Disapproved!")
 
     st.title("Manage user Access")
 
