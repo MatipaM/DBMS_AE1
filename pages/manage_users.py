@@ -38,8 +38,8 @@ def display():
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email, approved_status (?, ?, ?, ?)",
-                (row['Email'], datetime.now().date(), st.session_state.email, "True")
+                "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
+                (datetime.now().date(), st.session_state.email, "True", row['Email'])
             )
 
 
