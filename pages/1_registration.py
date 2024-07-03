@@ -131,7 +131,7 @@ if st.button('Submit'):
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
                                     st.session_state.email = email
-                                
+                                    
                                 if 'first_name' not in st.session_state:
                                     st.session_state.first_name = first_name.capitalize()
 
@@ -144,7 +144,10 @@ if st.button('Submit'):
                                 if 'affiliation' not in st.session_state:
                                     st.session_state.affiliation = affiliation
 
-                             
+                                if affiliation == "administrator":
+                                    pass
+                                
+
                                 for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
                                     if user_page_array not in st.session_state:
                                         st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)

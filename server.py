@@ -12,15 +12,16 @@ def connection():
         print(e)
     return conn
 
-def create_admin_auditing():
+def create_admin_audit():
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS Admin_Auditing (
-                email text PRIMARY KEY AUTOINCREMENT,
+                email text PRIMARY KEY,
                 approved_date TEXT NOT NULL,
                 approved_admin_email TEXT NOT NULL,
+                approved_status TEXT NOT NULL,
             )
         ''')
         conn.commit()
@@ -154,12 +155,30 @@ def save_sale():
         print(e)
         return jsonify({'error': 'Error saving data'}), 500
     
-# @app.route('/crazy_admin', methods=['POST'])
-# def save_admin_auditing():
-#       CREATE TABLE IF NOT EXISTS Admin_Auditing (
-#                 email text PRIMARY KEY AUTOINCREMENT,
-#                 approved_date TEXT NOT NULL,
-#                 approved_admin_email TEXT NOT NULL,
+@app.route('/crazy_admin_audit', methods=['POST'])
+def save_admin_audit():
+    create_admin_audit()
+    print("I am trying to save the admin auditing information")
+    email = request.json.get('email')
+    approved_date = request.json.get('approved_date')
+    approved_admin_email = request.json.get('approved_admin_email')
+    approved_status = request.json.get('approved_status')
+
+    if not email or not approved_date or not approved_admin_email or not approved_status:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        connect = connection()
+        cursor = connect.cursor()
+        cursor.execute('INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email, approved_status) VALUES (?, ?, ?, ?)', (email, approved_date, approved_admin_email, approved_status))
+        connect.commit()
+        cursor.close()
+        connect.close()
+        return jsonify({'message': 'Data saved'}), 201
+    except Error as e:
+        print(e)
+        return jsonify({'error': 'Error saving data'}), 500
+
 
 if __name__ == '__main__':
     create_books()  # Call create_books() only if running this script directly
