@@ -81,27 +81,22 @@ def user_exists():
     
 
 def approvedAdmin(email):
-    try:
-        connect = server.connection()
-        cursor = connect.cursor()
-        query = f'SELECT email, approved_status FROM admin_auditing where email=?'
-        cursor.execute(query, (email,))
-        db_email, approved_status = cursor.fetchone()
-        cursor.close()
-        connect.close()
+    connect = server.connection()
+    cursor = connect.cursor()
+    query = f'SELECT email, approved_status FROM admin_auditing where email=?'
+    cursor.execute(query, (email,))
+    db_email, approved_status = cursor.fetchone()
+    cursor.close()
+    connect.close()
 
-        print(f"email: {email}, approved_status: {approved_status}")
+    print(f"email: {email}, approved_status: {approved_status}")
 
-        if db_email == email:
-            if approved_status=="True":
-                st.session_state.user_page_array = InfoManager().get_instance().getPages(0) #full admin access
-            else:
-                st.session_state.user_page_array = InfoManager().get_instance().getPages(1) #student access which by default is limited
-        else:
-            return False, "Email is not associated with an account, Please register", "", "", ""
-    except sqlite3.Error as e:
-        print(e)
-        return False, "Not logged in successfully, please try again :(", "", "", ""
+    if "True" in approved_status:
+        print("Admin has access to all files")
+        st.session_state.user_page_array = InfoManager().get_instance().getPages(0) #full admin access
+    else:
+        print("Admin has limited access")
+        st.session_state.user_page_array = InfoManager().get_instance().getPages(1) #student access which by default is limited
 
 if st.button('Login'):
     userExists, email_message, first_name, last_name, affiliation = user_exists() #if user exsists and password correct
@@ -115,11 +110,17 @@ if st.button('Login'):
 
         for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
             if user_page_array not in st.session_state:
-                if idx==0:
-                    approvedAdmin(email) 
-                else:
+                st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
+
+        for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
+            if user_page_array not in st.session_state:
+                if affiliation==InfoManager().get_instance().users[idx]:
                     st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
                     print(st.session_state.user_page_array)
+                    if idx==0:
+                        approvedAdmin(email) 
+                        print(f"This admin has access to {st.session_state.user_page_array}")
+                        
         
     else:
         st.error(email_message)

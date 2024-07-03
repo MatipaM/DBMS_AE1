@@ -7,7 +7,7 @@ class InfoManager():
     librarian_pages = ["registration", "login", "add_book", "home", "lib_review", "payment", "request_book","return_book","user_sales"]
     administrator_pages = ["registration", "login", "add_book", "home", "lib_review", "manage_users", "payment", "request_book","return_book","user_sales"]
     staff_pages = ["registration", "login", "home", "manage_users","manager", "payment", "request book","return_book","users sales"]
-    student_pages = ["registration", "login", "home","manage_users", "payment", "request_book","return_book","users sales"] 
+    student_pages = ["registration", "login", "home", "payment", "request_book","return_book","users sales"] 
     
     users = ["administrator", "student", "staff", "librarian"]
     user_pages_arrays = [administrator_pages,student_pages, staff_pages, librarian_pages]
@@ -50,8 +50,7 @@ class InfoManager():
                 for key in st.session_state.keys():
                     del st.session_state[key]
                     InfoManager().get_instance().loginDefault()
-                    logout_btn = st.button("login")
-                    st.experimental_rerun()
+                    st.switch_page("pages/2_login.py")
         elif st.button("login"):
             st.switch_page("pages/2_login.py")
                     

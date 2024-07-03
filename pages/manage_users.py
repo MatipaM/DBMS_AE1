@@ -93,7 +93,7 @@ def display():
 
 current_file_name = os.path.basename(__file__)
 
-if hasattr(st.session_state, "first_name"):
+if hasattr(st.session_state, "user_page_array"):
     email = st.session_state.email
     first_name = st.session_state.first_name
     last_name = st.session_state.last_name
@@ -108,14 +108,6 @@ if hasattr(st.session_state, "first_name"):
         else:
             st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
             InfoManager().get_instance().logout()
-            
-    # for idx,i in enumerate(InfoManager().get_instance().users):
-    #     if st.session_state.affiliation == i:
-    #         if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
-    #             display()
-    #         else:
-    #             st.error(f"{first_name} {last_name}, {affiliation}'s are not authorised to view this page.")
-    #             InfoManager().get_instance().logout()
 else:
     InfoManager().get_instance().loginDefault()
     display()
