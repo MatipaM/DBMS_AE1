@@ -26,10 +26,7 @@ def display():
             buttons.append(new_select);
             if new_select:
                 pages_name.append(f"{b}")
-                print("page name", b)
 
-
-        print("pages_name", pages_name)
         InfoManager().user_pages_arrays[a] = pages_name
 
         pd.DataFrame({
