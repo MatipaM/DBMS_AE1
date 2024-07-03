@@ -22,41 +22,38 @@ def display():
     cursor.execute('''SELECT distinct User.email, first_name, last_name, affiliation, Admin_Auditing.approved_status
                    FROM User 
                    join Admin_Auditing on Admin_Auditing.email = User.email
-                   Where User.email = Admin_Auditing.Email and Admin_Auditing.approved_status='False'
+                   Where User.email = Admin_Auditing.Email and Admin_Auditing.approved_status='False' and Admin_Auditing.approved_date='null'
                     ''')
 
     columns = ['Email', 'First name', 'Last Name', 'Affiliation', 'Approved Status']
 
     rows = cursor.fetchall()
 
+
     df = pd.DataFrame(rows, columns=columns)
     df['Select'] = False
-    table = st.data_editor(df, num_rows="dynamic")
 
-    st.write(df[df['Select'] == True])
+    # Display the DataFrame in Streamlit
+    table = st.data_editor(df, num_rows="dynamic", key='data_editor')
+    approved_requests = table[table['Select'] == True]
+    # st.write("Approved requests:", approved_requests)
 
+    # Button to approve selected users
     if st.button("Approve"):
-        approved_requests = df[df['Select'] == True]
-
-        for index,row in approved_requests.iterrows():
-            print(index,row)
+        for index, row in approved_requests.iterrows():
+            st.write(f"Updating: {row['Email']}")
             cursor.execute(
                 "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
-                (datetime.now().date(), st.session_state.email, "True", row['Email'])
+                (datetime.now().date(), st.session_state.get('email', 'admin@example.com'), "True", row['Email'])
             )
-
-            print(f"Updating: {row['Email']}")
-            
-
+        
         conn.commit()
         conn.close()
-        # df = df[df['Select'] == False]
-        # df.drop(columns=['Select'], inplace=True)
+        table.drop(columns=['Select'], inplace=True)
         st.write("Approved!")
     elif st.button("Disapprove"):
-        approved_requests = df[df['Select'] == True]
-
         for index, row in approved_requests.iterrows():
+            st.write(f"Updating: {row['Email']}")
             cursor.execute(
             "UPDATE Admin_Auditing SET approved_date = ?, approved_admin_email = ?, approved_status = ? WHERE email = ?",
             (datetime.now().date(), st.session_state.email, "False", row['Email'])
@@ -64,8 +61,7 @@ def display():
 
         conn.commit()
         conn.close()
-        df = df[df['Select'] == False]
-        df.drop(columns=['Select'], inplace=True)
+        table.drop(columns=['Select'], inplace=True)
         st.write("Disapproved!")
 
     st.title("Manage user Access")
