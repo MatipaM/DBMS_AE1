@@ -19,8 +19,8 @@ def create_admin_audit():
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS Admin_Auditing (
                 email text PRIMARY KEY,
-                approved_date TEXT NOT NULL,
-                approved_admin_email TEXT NOT NULL,
+                approved_date TEXT,
+                approved_admin_email TEXT,
                 approved_status TEXT NOT NULL,
             )
         ''')
