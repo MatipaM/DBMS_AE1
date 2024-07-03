@@ -48,8 +48,8 @@ def display():
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_records (id, borrowed_date, returned_date, email) VALUES (?, ?, NULL, ?)",
-                (row['id'], row['date_request'], row['email'])
+                "INSERT INTO Book_records (id, borrowed_date, returned_date, email) VALUES (?, ?, ?, ?)",
+                (row['id'], row['date_request'], '', row['email'])
             )
 
             cursor.execute(

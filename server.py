@@ -159,6 +159,47 @@ def create_book_records():
     except Error as e:
         print(e)
 
+def addbookandsales():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM Books")
+    existing_ids = set(row[0] for row in cursor.fetchall())
+
+    books_data = [
+        (1, "The Great Gatsby", "F. Scott Fitzgerald", "Scribner", "2004", "1925", "A classic novel of the Roaring Twenties", "N/A", "1st", 10, 10, 5, "Great book", 15),
+        (2, "To Kill a Mockingbird", "Harper Lee", "J.B. Lippincott & Co.", "2010", "1960", "A novel about racial injustice in the Deep South", "N/A", "1st", 8, 8, 5, "Must read", 10),
+        (3, "1984", "George Orwell", "Secker & Warburg", "1990", "1949", "A dystopian social science fiction novel", "N/A", "1st", 12, 12, 5, "Very relevant", 20),
+        (4, "Pride and Prejudice", "Jane Austen", "T. Egerton", "2000", "1813", "A romantic novel of manners", "N/A", "1st", 15, 15, 5, "Classic novel", 12),
+        (5, "The Catcher in the Rye", "J.D. Salinger", "Little, Brown and Company", "1991", "1951", "A story about adolescent alienation", "N/A", "1st", 20, 20, 5, "Timeless read", 18)
+    ]
+
+    books_data = [book for book in books_data if book[0] not in existing_ids]
+
+    cursor.executemany("""
+        INSERT INTO Books (id, title, author, publisher, year_purchased, year_published, description, secondary_title, version, quantity, available, rating, review, price) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, books_data)
+
+    sales_data = [
+        ("1", "S001", "2023", 15, "2023-06-01"),
+        ("2", "S002", "2023", 10, "2023-06-02"),
+        ("3", "S003", "2023", 20, "2023-06-03"),
+        ("1", "S004", "2023", 15, "2023-06-04"),
+        ("2", "S005", "2023", 10, "2023-06-05")
+    ]
+
+    cursor.executemany("""
+        INSERT INTO Sales (BookID, SalesID, Year_Purchased, Price, date) 
+        VALUES (?, ?, ?, ?, ?)
+    """, sales_data)
+
+    conn.commit()
+    conn.close()
+
+#addbookandsales()
+
+
 @app.route('/outstanding_bills', methods=['POST'])
 def save_outstanding_bills():
     create_outstanding_bills()
