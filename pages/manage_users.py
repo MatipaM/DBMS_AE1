@@ -2,15 +2,22 @@ import streamlit as st
 import pandas  as pd
 from InfoManager import InfoManager
 import os
+import sqlite3
 
 def display():
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     st.title("Manage users")
 
     st.write("Authenticate Adminstrators")
-    st.write("Authenticate Students")
-    st.write("Authenticate staff")
-    st.write("Autennticate Librarians")
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    #calc whether overdue instead of writing borrowed/returned date
+    cursor.execute('''SELECT distinct Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount 
+                   FROM Pending_Request 
+                   left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email''')
+
+
     st.title("Manage user Access")
 
     column_headings = ["Pages user has access to", "Approve"]
@@ -26,7 +33,6 @@ def display():
             buttons.append(new_select);
             if new_select:
                 pages_name.append(f"{b}")
-                print("page name", b)
 
 
         print("pages_name", pages_name)
@@ -51,8 +57,6 @@ if hasattr(st.session_state, "first_name"):
 
     for idx,i in enumerate(InfoManager().get_instance().users):
         if st.session_state.affiliation == i:
-            print("affiliation", st.session_state.affiliation)
-            print(current_file_name, InfoManager().get_instance().getPages(idx))
             if current_file_name[:-3] in InfoManager().get_instance().getPages(idx):
                 display()
             else:

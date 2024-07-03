@@ -20,8 +20,7 @@ def create_admin_audit():
             CREATE TABLE IF NOT EXISTS Admin_Auditing (
                 email text PRIMARY KEY,
                 approved_date TEXT,
-                approved_admin_email TEXT,
-                approved_status TEXT NOT NULL,
+                approved_admin_email TEXT
             )
         ''')
         conn.commit()
@@ -118,8 +117,31 @@ def save():
 
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
-    # Function implementation remains the same as in your original code
-    pass
+    create_user_table()
+    print("I am trying to save the user's information")
+    first_name = request.json.get('first_name')
+    last_name = request.json.get('last_name')
+    profile_picture = request.json.get('profile_picture')
+    address = request.json.get('address')  
+    affiliation = request.json.get('affiliation')  
+    phone = request.json.get('phone')
+    email = request.json.get('email')
+    password= request.json.get('password')  
+
+    if not first_name or not last_name or not profile_picture or not address or not phone or not email or not password or not affiliation:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        connect = connection()
+        cursor = connect.cursor()
+        cursor.execute('INSERT INTO USER (first_name, last_name, profile_picture, address, affiliation, phone, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, profile_picture, address, affiliation, phone, email, password))
+        connect.commit()
+        cursor.close()
+        connect.close()
+        return jsonify({'message': 'Data saved'}), 201
+    except Error as e:
+        print(e)
+        return jsonify({'error': 'Error saving data'}), 500
 
 @app.route('/crazy_borrow', methods=['POST'])
 def borrow_book():
@@ -162,15 +184,14 @@ def save_admin_audit():
     email = request.json.get('email')
     approved_date = request.json.get('approved_date')
     approved_admin_email = request.json.get('approved_admin_email')
-    approved_status = request.json.get('approved_status')
 
-    if not email or not approved_date or not approved_admin_email or not approved_status:
+    if not email or not approved_date or not approved_admin_email:
         return jsonify({'error': 'No data provided'}), 400
 
     try:
         connect = connection()
         cursor = connect.cursor()
-        cursor.execute('INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email, approved_status) VALUES (?, ?, ?, ?)', (email, approved_date, approved_admin_email, approved_status))
+        cursor.execute('INSERT INTO Admin_Auditing (email, approved_date, approved_admin_email) VALUES (?, ?, ?)', (email, approved_date, approved_admin_email))
         connect.commit()
         cursor.close()
         connect.close()

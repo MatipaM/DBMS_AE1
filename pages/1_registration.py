@@ -145,12 +145,11 @@ if st.button('Submit'):
                                     st.session_state.affiliation = affiliation
 
                                 if affiliation == "administrator":
-                                    response2 = requests.post('http://127.0.0.1:5000/crazy_admin_audit', json={'email': email, 'approved_date': "", 'approved_admin_email': "", 'approved_status':"False"})
+                                    response2 = requests.post('http://127.0.0.1:5000/crazy_admin_audit', json={'email': email, 'approved_date': "null", 'approved_admin_email': "null"})
 
                                 for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
                                     if user_page_array not in st.session_state:
                                         st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
-                                        print(st.session_state.user_page_array)
                             else:
                                 st.error("Account not created succesfully :(")
                         else:
