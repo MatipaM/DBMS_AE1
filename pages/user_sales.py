@@ -12,7 +12,7 @@ def display():
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Sales s LEFT JOIN Books b ON s.BookID = b.id WHERE Date IS NULL")
+    cursor.execute("SELECT * FROM Sales s LEFT JOIN Books b ON s.BookID = b.id WHERE date IS NULL")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -22,7 +22,7 @@ def display():
         if row[3] is None:
             row[3] = 20
 
-    st.write(rows)
+    #st.write(rows)
 
     if rows:
         df = [(row[0], row[1], row[2], f'£{row[3]}', row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18]) for row in rows]
