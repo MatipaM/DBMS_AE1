@@ -70,7 +70,6 @@ def create_books():
                     description TEXT NOT NULL,
                     secondary_title TEXT NOT NULL,
                     version TEXT NOT NULL,
-                    quantity INTEGER NOT NULL,
                     available INTEGER NOT NULL,
                     rating INTEGER NOT NULL,
                     review TEXT,
@@ -251,7 +250,7 @@ def save():
             return jsonify({"error": "No data provided"}), 400
 
         required = ['title', 'author', 'publisher', 'year_purchased', 'description', 
-                           'secondary_title', 'version', 'quantity', 'available', 'rating', 'price']
+                           'secondary_title', 'version', 'available', 'rating', 'price']
         
         for r in required:
             if r not in data:
@@ -262,13 +261,13 @@ def save():
             cursor.execute(
                 '''
                 INSERT INTO Books (title, author, publisher, year_purchased, year_published, description, 
-                                secondary_title, version, quantity, available, rating, 
+                                secondary_title, version, available, rating, 
                                 review, price)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', 
                 (data['title'], data['author'], data['publisher'], data['year_purchased'],
                 data['year_published'], data['description'], data['secondary_title'], data['version'], 
-                int(data['quantity']), int(data['available']), int(data['rating']), 
+                int(data['available']), int(data['rating']), 
                 data.get('review'), float(data['price']))
             )
             conn.commit()
@@ -461,6 +460,7 @@ create_outstanding_bills()
 create_pending_request()
 create_sales_table()
 create_user_table()
+create_admin_audit()
 
 if __name__ == '__main__':
     create_books()  # Call create_books() only if running this script directly

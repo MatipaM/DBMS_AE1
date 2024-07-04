@@ -47,11 +47,17 @@ def display():
             if review:
                 data['review'] = review
 
-            response = requests.post('http://127.0.0.1:5000/crazy_books', json=data)
-            if response.status_code == 201:
-                st.success('Books submitted!')
-            else:
-                st.error(f'Failed to submit books: {response.status_code}')
+            def submitBook():
+                response = requests.post('http://127.0.0.1:5000/crazy_books', json=data)
+                if response.status_code == 201:
+                    st.success('Books submitted!')
+                else:
+                    st.error(f'Failed to submit books: {response.status_code}')
+
+            for i in range(quantity):
+                submitBook()
+
+
 
     with col2:
         if st.button('Back to Home Page'):
