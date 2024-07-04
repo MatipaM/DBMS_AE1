@@ -4,6 +4,8 @@ from string import punctuation
 import sqlite3
 import server
 from InfoManager import InfoManager
+import bcrypt
+import html
 #import phonenumbers
 
 st.title("Registration Page")
@@ -22,6 +24,8 @@ phone = st.text_input('Enter phone number:', value='+44', max_chars=13, placehol
 affiliation = st.selectbox('Are you a: ', ('student', 'librarian', 'staff', 'administrator'))
 email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lower()}@{affiliation}.com")
 password = st.text_input('Create password:', type='password')
+
+hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
 def checkEmail():
     hasAt = '@' in email
@@ -119,7 +123,7 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': html.escape(first_name), 'last_name': html.escape(last_name), 'address': html.escape(address), 'affiliation': html.escape(affiliation), 'phone': html.escape(phone), 'email': html.escape(email), 'password':html.escape(hashed_password), 'profile_picture': html.escape(profile_picture)})
                             if response.status_code == 201:
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:

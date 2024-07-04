@@ -3,6 +3,7 @@ import streamlit as st
 import requests
 from InfoManager import InfoManager
 import os
+import html
 # import server
 
 def display():
