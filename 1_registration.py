@@ -10,8 +10,6 @@ import html
 
 st.title("Registration Page")
 
-
-
 first_name = st.text_input('Enter First Name:')
 last_name = st.text_input('Enter Last Name:')
 profile_picture = st.text_area('Upload profile picture:')
@@ -110,14 +108,7 @@ def user_exists():
 address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
-
-# check affiliation and email match
-Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage users","manager", "payment", "request book","return book","users sales"]
-
-users = ["librarian", "student", "staff", "admin"]
-
 if st.button('Submit'):
-# if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
     emailValid, email_route = checkEmail()
     if emailValid:
         isPasswordValid, password_message = checkPassword()

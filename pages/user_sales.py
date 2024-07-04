@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from datetime import datetime
+import datetime
 import sqlite3
 import pandas as pd
 import os
@@ -12,7 +12,7 @@ def display():
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Sales")
+    cursor.execute("SELECT * FROM Sales s LEFT JOIN Books b ON s.BookID = b.id WHERE Date IS NULL")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -22,8 +22,10 @@ def display():
         if row[3] is None:
             row[3] = 20
 
+    st.write(rows)
+
     if rows:
-        df = [(row[0], row[1], row[2], f'£{row[3]}') for row in rows]
+        df = [(row[0], row[1], row[2], f'£{row[3]}', row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18]) for row in rows]
         df = pd.DataFrame(df, columns=columns)
         df['Select'] = False
         df = st.data_editor(df, num_rows="dynamic")
@@ -35,14 +37,9 @@ def display():
 
         for index, row in purchased_books.iterrows():
             cursor.execute(
-                "DELETE FROM Sales WHERE SalesID = ? AND BookID = ? AND Year_Purchased = ? AND Price = ?",
-                (row['SalesID'], row['BookID'], row['Year_Purchased'], row['Price'])
+                "UPDATE Sales SET date = ? WHERE BookID = ?",
+                (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), row['BookID'])
             )
-            cursor.execute(
-                "INSERT INTO `Transaction` (SalesID, Date) VALUES (?, ?)",
-                (row['SalesID'], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-            )
-
         conn.commit()
         conn.close()
 
@@ -50,6 +47,7 @@ def display():
         st.switch_page("pages/payment.py")
 
         df = df[df['Select'] == False]
+
 
     InfoManager().get_instance().logout()
 
