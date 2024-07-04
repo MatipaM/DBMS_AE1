@@ -6,8 +6,8 @@ class InfoManager():
 
     librarian_pages = ["registration", "login", "add_book", "home", "lib_review", "payment", "request_book","return_book","user_sales"]
     administrator_pages = ["registration", "login", "add_book", "home", "lib_review", "manage_users", "payment", "request_book","return_book","user_sales"]
-    staff_pages = ["registration", "login", "home", "manage_users","manager", "payment", "request book","return_book","users sales"]
-    student_pages = ["registration", "login", "home", "payment", "request_book","return_book","users sales"] 
+    staff_pages = ["registration", "login", "home", "manage_users","manager", "payment", "request book","return_book","user_sales"]
+    student_pages = ["registration", "login", "home", "payment", "request_book","return_book","user_sales"] 
     
     users = ["administrator", "student", "staff", "librarian"]
     user_pages_arrays = [administrator_pages,student_pages, staff_pages, librarian_pages]
