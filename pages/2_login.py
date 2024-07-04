@@ -5,6 +5,8 @@ import server
 import sqlite3
 import requests
 from InfoManager import InfoManager
+import bcrypt
+
 
 # Function to add background image
 def add_bg_from_local(image_path):
@@ -69,7 +71,7 @@ def user_exists():
         connect.close()
 
         if db_email == email:
-            if password == db_password:
+            if bcrypt.checkpw(password, db_password):
                 return True, "Login successful", db_first_name, db_last_name, db_affiliation
             else:
                 return False, "incorrect password", "", "", ""

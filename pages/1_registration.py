@@ -24,8 +24,7 @@ affiliation = st.selectbox('Are you a: ', ('student', 'librarian', 'staff', 'adm
 email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lower()}@{affiliation}.com")
 password = st.text_input('Create password:', type='password')
 
-# hashed_password = bcrypt.hashpw(password, bcrypt.gensalt(12))
-# print(hashed_password)
+hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
 def checkEmail():
     hasAt = '@' in email
@@ -130,7 +129,7 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':hashed_password, 'profile_picture': profile_picture})
                             if response.status_code == 201:
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
