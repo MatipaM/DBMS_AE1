@@ -71,7 +71,7 @@ def user_exists():
         connect.close()
 
         if db_email == email:
-            if bcrypt.checkpw(password, db_password):
+            if bcrypt.checkpw(password.encode('utf-8'), db_password.encode('utf-8')):
                 return True, "Login successful", db_first_name, db_last_name, db_affiliation
             else:
                 return False, "incorrect password", "", "", ""
@@ -123,6 +123,5 @@ if st.button('Login'):
                         approvedAdmin(email) 
                         print(f"This admin has access to {st.session_state.user_page_array}")
                         
-        
     else:
         st.error(email_message)
