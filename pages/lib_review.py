@@ -13,7 +13,7 @@ def display():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT pr.id, pr.email, pr.date_request, pr.title, pr.interest, pr.affiliation, b.author, b.publisher, b.year_purchased, b.year_published, b.description, b.secondary_title, b.version, b.quantity, b.available, b.rating, b.review, b.price, ob.email AS ob_email, ob.price AS ob_price FROM Pending_Request pr LEFT JOIN Books b ON pr.title = b.title LEFT JOIN Outstanding_Bills ob ON pr.email = ob.email;")
+    cursor.execute("SELECT pr.id, pr.email, pr.date_request, pr.title, pr.interest, pr.affiliation, b.author, b.publisher, b.year_purchased, b.year_published, b.description, b.secondary_title, b.version, b.available, b.rating, b.review, b.price, ob.email AS ob_email, ob.price AS ob_price FROM Pending_Request pr LEFT JOIN Books b ON pr.title = b.title LEFT JOIN Outstanding_Bills ob ON pr.email = ob.email;")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
