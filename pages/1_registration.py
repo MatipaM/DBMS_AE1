@@ -4,6 +4,7 @@ from string import punctuation
 import sqlite3
 import server
 from InfoManager import InfoManager
+import bcrypt
 #import phonenumbers
 
 st.title("Registration Page")
@@ -22,6 +23,9 @@ phone = st.text_input('Enter phone number:', value='+44', max_chars=13, placehol
 affiliation = st.selectbox('Are you a: ', ('student', 'librarian', 'staff', 'administrator'))
 email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lower()}@{affiliation}.com")
 password = st.text_input('Create password:', type='password')
+
+# hashed_password = bcrypt.hashpw(password, bcrypt.gensalt(12))
+# print(hashed_password)
 
 def checkEmail():
     hasAt = '@' in email
