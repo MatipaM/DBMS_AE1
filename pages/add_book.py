@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from InfoManager import InfoManager
 import os
+import html
 # import server
 
 def display():
@@ -20,7 +21,7 @@ def display():
 
 
     if st.button('Submit'):
-        response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': title, 'author': author, 'publisher': publisher, 'year_purchased': year_purchased, 'description': description, 'secondary_title':secondary_title, 'version':version, 'quantity': quantity})
+        response = requests.post('http://127.0.0.1:5000/crazy_books', json={'title': html.escape(title), 'author': html.escape(author), 'publisher': html.escape(publisher), 'year_purchased': html.escape(year_purchased), 'description': html.escape(description), 'secondary_title':html.escape(secondary_title), 'version':html.escape(version), 'quantity': html.escape(quantity)})
         if response.status_code == 201:
             st.success('Books submitted!')
         else:
