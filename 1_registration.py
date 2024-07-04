@@ -10,8 +10,6 @@ import html
 
 st.title("Registration Page")
 
-
-
 first_name = st.text_input('Enter First Name:')
 last_name = st.text_input('Enter Last Name:')
 profile_picture = st.text_area('Upload profile picture:')
