@@ -7,16 +7,19 @@ from InfoManager import InfoManager
 
 # Librarian Book Request Review
 # 3 conditions: Returned all books AND paid outstanding bills, 
-# Use hello@gmail.com to test!!!!
 
 def display():
     st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     #calc whether overdue instead of writing borrowed/returned date
-    cursor.execute("SELECT distinct Book_Records.Borrowed_Date, Book_Records.Returned_Date, Book_Records.Rating, Book_Records.Review, Pending_Request.title, Pending_Request.affiliation, Pending_Request.email, Pending_Request.request_date, Outstanding_Bills.amount FROM Pending_Request left JOIN Outstanding_Bills ON Outstanding_Bills.Email = Pending_Request.email left JOIN Book_Records ON Outstanding_Bills.Email") #removed affiliation should be able to see from email
+    cursor.execute("SELECT pr.id, pr.email, pr.date_request, pr.title, pr.interest, pr.affiliation, b.author, b.publisher, b.year_purchased, b.year_published, b.description, b.secondary_title, b.version, b.quantity, b.available, b.rating, b.review, b.price, ob.email AS ob_email, ob.price AS ob_price FROM Pending_Request pr LEFT JOIN Books b ON pr.title = b.title LEFT JOIN Outstanding_Bills ob ON pr.email = ob.email;")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
+
+    st.write("### Add Books to Library")
+    if st.button("Add Books"):
+        st.switch_page("pages/add_book.py")
 
     st.write("### Pending Book Requests")
 
@@ -24,88 +27,67 @@ def display():
         df = pd.DataFrame(rows, columns=columns)
         df['Select'] = False
         df = st.data_editor(df, num_rows="dynamic")
-    else:
-        st.write("No Book Requests.")
-
-
-    # Criteria 1 (Returned all books)
-
-    # st.write("### Checklist 1: Outstanding Books")
-    # cursor.execute("SELECT br.Title, br.Borrowed_Date, br.Returned_Date, br.Email AS Borrower_Email, br.Rating, br.Review, pr.Email AS Requester_Email, pr.Request_Date FROM Book_Records br JOIN Pending_Request pr ON br.Email = pr.Email WHERE (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NOT NULL) OR (br.Borrowed_Date IS NOT NULL AND br.Returned_Date IS NULL)")
-    # row2 = cursor.fetchall()
-    # column2 = [description[0] for description in cursor.description]
-
-    # if row2:
-    #     df2 = pd.DataFrame(row2, columns=column2)
-    #     df2 = st.data_editor(df2, num_rows="dynamic")
     # else:
-    #     st.write("No outstanding books.")
+    #     st.write("No Book Requests.")
+
+    approve_btn = ""
+    disaprove_btn = ""
 
 
-
-    # Criteria 3 (Current Student)
-
-    # st.write("### Checklist 3: Current Student")
-
-    # cursor.execute("SELECT Email, Affiliation FROM Pending_Request")
-    # row4 = cursor.fetchall()
-    # column4 = [description[0] for description in cursor.description]
-
-
-    # if row4:
-    #     df4 = pd.DataFrame(row4, columns=column4)
-    #     df4 = st.data_editor(df4, num_rows="dynamic")
-    # else:
-    #     st.write("No current students.")
+    try:
+        df[df['Select'] ==True]
+        approve_btn = st.button("Approve")
+        disaprove_btn = st.button("Disapprove")
+    except UnboundLocalError:
+       approve_btn = st.write("There are no requests to approve")
+       disaprove_btn = st.write("There are no requests to disapprove")
 
     # Approve or Disapprove Button
-
-    if st.button("Approve"):
+    if approve_btn:
         approved_requests = df[df['Select'] == True]
 
         for index, row in approved_requests.iterrows():
             cursor.execute(
-                "INSERT INTO Book_Records (Title, Borrowed_Date, Email, Returned_Date, Rating, Review) VALUES (?, ?, ?, NULL, NULL, NULL)",
-                (row['Title'], row['Request_Date'], row['Email'])
+                "INSERT INTO Book_records (id, borrowed_date, returned_date, email) VALUES (?, ?, ?, ?)",
+                (row['id'], row['date_request'], '', row['email'])
             )
+
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
-                (row['Title'], row['Email'], row['Request_Date'])
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
+                (row['title'], row['email'], row['date_request'])
             )
         conn.commit()
-        conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Approved!")
+        st.write("You have approved the book request!")
 
-    elif st.button("Disapprove"):
+    elif disaprove_btn:
         disapproved_requests = df[df['Select'] == True]
         reasons = []
         for index, row in disapproved_requests.iterrows():
             cursor.execute(
-                "DELETE FROM Pending_Request WHERE Title = ? AND Email = ? AND Request_Date = ?",
-                (row['Title'], row['Email'], row['Request_Date'])
+                "DELETE FROM Pending_Request WHERE title = ? AND email = ? AND date_request = ?",
+                (row['title'], row['email'], row['date_request'])
             )
             conn.commit()
-            cursor.execute("SELECT COUNT(*) FROM Book_Records WHERE Returned_Date IS NULL")
+            cursor.execute("SELECT COUNT(*) FROM Book_records WHERE returned_date IS NULL")
             unreturned_count = cursor.fetchone()[0]
             
-            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE Email = ?", (row['Email'],))
+            cursor.execute("SELECT COUNT(*) FROM Outstanding_Bills WHERE email = ?", (row['email'],))
             outstanding_count = cursor.fetchone()[0]
             
-            reason = f"Request for {row['Title']} by {row['Email']} disapproved because: "
+            reason = f"Request for {row['title']} by {row['email']} disapproved because: "
             if unreturned_count > 0:
                 reason += "You have unreturned books. "
             if outstanding_count > 0:
                 reason += "You have outstanding bills. "
-            # else:
-            #     reason = "You are not a current student. If you are a current student, please contact the help@librarian.com"
-            
+            if not row['email'].endswith('@student.com'):
+                reason += "Your email does not end with @student.com. "
             reasons.append(reason)
         conn.close()
         df = df[df['Select'] == False]
         df.drop(columns=['Select'], inplace=True)
-        st.write("Disapproved!")
+        st.write("You have disapproved the book request!")
 
         #Students need to be notified
         st.session_state.disapproval_reasons = reasons

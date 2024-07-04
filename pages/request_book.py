@@ -2,20 +2,18 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import requests
-from datetime import datetime
-from InfoManager import InfoManager
+import datetime
+import server
 import os
-
+from InfoManager import InfoManager
 
 def display():
-    st.header(f"Hello {st.session_state.first_name} {st.session_state.last_name}")
-    st.title("Available Books!")
-
+    st.title("Book Borrow Section")
     st.write("Here are the books available for borrowing:")
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT Title, Secondary_Title, Author, Publisher, Description, Version FROM Books")
+    cursor.execute("SELECT id, title, author, publisher, description, version FROM Books")
     rows = cursor.fetchall()
     columns = [description[0] for description in cursor.description]
 
@@ -28,30 +26,35 @@ def display():
 
     conn.close()
 
-
-
-    st.title("Want to Borrow Book?")
-
-
     interest = st.text_input('Book Interests:')
-    request_date =  st.date_input('Request Date:', datetime.today())
+    request_date = st.date_input('Request Date:', datetime.datetime.now())
 
     if st.button('Borrow Selected Books'):
-        request_date_str = request_date.strftime('%Y-%m-%d')
+        request_date_str = request_date.strftime('%Y-%m-%d %H:%M:%S')
         selected_books = df[df['Select'] == True]
         if selected_books.empty:
             st.warning('Please select at least one book to borrow.')
         else:
-            selected_books = selected_books.drop(columns=['Select'])
-            title = ', '.join(selected_books['Title'].tolist())
-            st.write(f'Borrowing books: {title, request_date_str, affiliation, interest, email}')
-
-        response = requests.post('http://127.0.0.1:5000/crazy_borrow', json={'email': email, 'title': title, 'affiliation': affiliation, 'interest': interest, 'request_date': request_date_str})
-        if response.status_code == 201:
-            st.success('Book requested!')
-            #st.switch_page("pages/wait.py")
-        else:
-            st.error('Failed to submit books')
+            selected_books['interest'] = interest
+            books = selected_books.to_dict('records')
+            for book in books:
+                book['id'] = int(book['id'])
+            #st.write("Selected Books:")
+            #st.write(books)
+            #st.write("Request Data:")
+            request_data = {'email': email, 'date_request': request_date_str, 'books': books}
+            #st.write(request_data)
+            
+            response = requests.post('http://127.0.0.1:5000/crazy_borrow', json=request_data)
+            try:
+                response.json()
+            except requests.exceptions.JSONDecodeError as e:
+                str(e)
+                response.text
+            if response.status_code == 201:
+                st.success('Book requested!')
+            else:
+                st.error('Failed to submit books')
 
     InfoManager().get_instance().logout()
 

@@ -4,11 +4,11 @@ from string import punctuation
 import sqlite3
 import server
 from InfoManager import InfoManager
+import bcrypt
+import html
 #import phonenumbers
 
 st.title("Registration Page")
-
-
 
 first_name = st.text_input('Enter First Name:')
 last_name = st.text_input('Enter Last Name:')
@@ -22,6 +22,8 @@ phone = st.text_input('Enter phone number:', value='+44', max_chars=13, placehol
 affiliation = st.selectbox('Are you a: ', ('student', 'librarian', 'staff', 'administrator'))
 email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lower()}@{affiliation}.com")
 password = st.text_input('Create password:', type='password')
+
+hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
 def checkEmail():
     hasAt = '@' in email
@@ -106,14 +108,7 @@ def user_exists():
 address = f"{street}, {city}, {country}, {postal_code}"
 user_type = email[email.index("@")+1: email.index(".com")]
 
-
-# check affiliation and email match
-Project  = ["Registeration", "login", "add book", "Home", "lib review", "manage users","manager", "payment", "request book","return book","users sales"]
-
-users = ["librarian", "student", "staff", "admin"]
-
 if st.button('Submit'):
-# if st.write("<a href='request_book'>Submit</a>", unsafe_allow_html=True):
     emailValid, email_route = checkEmail()
     if emailValid:
         isPasswordValid, password_message = checkPassword()
@@ -126,12 +121,12 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': html.escape(first_name), 'last_name': html.escape(last_name), 'address': html.escape(address), 'affiliation': html.escape(affiliation), 'phone': html.escape(phone), 'email': html.escape(email), 'password':html.escape(hashed_password), 'profile_picture': html.escape(profile_picture)})
                             if response.status_code == 201:
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
                                     st.session_state.email = email
-                                
+                                    
                                 if 'first_name' not in st.session_state:
                                     st.session_state.first_name = first_name.capitalize()
 
@@ -144,11 +139,18 @@ if st.button('Submit'):
                                 if 'affiliation' not in st.session_state:
                                     st.session_state.affiliation = affiliation
 
-                             
                                 for idx, user_page_array in enumerate(InfoManager().get_instance().user_pages_arrays):
                                     if user_page_array not in st.session_state:
-                                        st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
-                                        print(st.session_state.user_page_array)
+                                        if affiliation==InfoManager().get_instance().users[idx]:
+                                            st.session_state.user_page_array = InfoManager().get_instance().getPages(idx)
+                                            print(st.session_state.user_page_array)
+                    
+                                                               
+                                if affiliation == "administrator":
+                                    response2 = requests.post('http://127.0.0.1:5000/crazy_admin_audit', json={'email': email, 'approved_date': "null", 'approved_admin_email': "null", "approved_status": "False"})
+                                    st.session_state.user_page_array = InfoManager().get_instance().getPages(1)
+
+                                    
                             else:
                                 st.error("Account not created succesfully :(")
                         else:
