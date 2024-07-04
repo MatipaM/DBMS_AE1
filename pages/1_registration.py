@@ -5,6 +5,7 @@ import sqlite3
 import server
 from InfoManager import InfoManager
 import bcrypt
+import html
 #import phonenumbers
 
 st.title("Registration Page")
@@ -129,7 +130,7 @@ if st.button('Submit'):
                 if postalValid:
                     if not userExists:
                         if isPasswordValid:
-                            response = requests.post(email_route, json={'first_name': first_name, 'last_name': last_name, 'address': address, 'affiliation': affiliation, 'phone': phone, 'email': email, 'password':hashed_password, 'profile_picture': profile_picture})
+                            response = requests.post(email_route, json={'first_name': html.escape(first_name), 'last_name': html.escape(last_name), 'address': html.escape(address), 'affiliation': html.escape(affiliation), 'phone': html.escape(phone), 'email': html.escape(email), 'password':html.escape(hashed_password), 'profile_picture': html.escape(profile_picture)})
                             if response.status_code == 201:
                                 st.success('Registered successfully!')
                                 if 'email' not in st.session_state:
