@@ -20,10 +20,13 @@ def display():
     secondary_title = st.text_area('Enter secondary title:')
     version = st.text_area('Enter version:')
     quantity = st.number_input('Enter number of books: ', min_value=1)
-    available = st.number_input('Enter number of books available: ', min_value=1)
-    rating = st.number_input('Enter rating: ', min_value=1, max_value=5)
-    review = st.text_area('Enter review:')
+    # available = st.number_input('Enter number of books available: ', min_value=1)
+    # rating = st.number_input('Enter rating: ', min_value=1, max_value=5)
+    # review = st.text_area('Enter review:')
     price = st.number_input('Enter price:', value=0.0)
+    available = "available"
+    review = "great"
+    rating = 5
 
     col1, col2 = st.columns(2)
 
@@ -38,15 +41,11 @@ def display():
                 'description': description,
                 'secondary_title': secondary_title,
                 'version': version,
-                'quantity': quantity, 
                 'available': available,
                 'rating': rating,
-                'price': price
+                'price': price,
+                'review': review
             }
-
-            if review:
-                data['review'] = review
-
             def submitBook():
                 response = requests.post('http://127.0.0.1:5000/crazy_books', json=data)
                 if response.status_code == 201:

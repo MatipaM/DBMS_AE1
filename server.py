@@ -70,7 +70,7 @@ def create_books():
                     description TEXT NOT NULL,
                     secondary_title TEXT NOT NULL,
                     version TEXT NOT NULL,
-                    available INTEGER NOT NULL,
+                    available TEXT NOT NULL,
                     rating INTEGER NOT NULL,
                     review TEXT,
                     price INTEGER NOT NULL)''')
@@ -245,12 +245,13 @@ def save_outstanding_bills():
 def save():
     try:
         data = request.get_json()
+        print(data)
 
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        required = ['title', 'author', 'publisher', 'year_purchased', 'description', 
-                           'secondary_title', 'version', 'available', 'rating', 'price']
+        required = ['title', 'author', 'publisher', 'year_purchased','year_published', 'description', 
+                           'secondary_title', 'version', 'available','review', 'rating', 'price']
         
         for r in required:
             if r not in data:
@@ -267,7 +268,7 @@ def save():
                 ''', 
                 (data['title'], data['author'], data['publisher'], data['year_purchased'],
                 data['year_published'], data['description'], data['secondary_title'], data['version'], 
-                int(data['available']), int(data['rating']), 
+                (data['available']), int(data['rating']), 
                 data.get('review'), float(data['price']))
             )
             conn.commit()
@@ -275,9 +276,9 @@ def save():
         return jsonify({"message": "Book submitted successfully"}), 201
 
     except sqlite3.Error as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return (jsonify({"error": f"Database error: {str(e)}"}), 500)
     except Exception as e:
-        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+        return (jsonify({"error": f"Unexpected error: {str(e)}"}), 500)
 
 
 @app.route('/crazy_user', methods=['POST'])
