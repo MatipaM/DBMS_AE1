@@ -113,8 +113,41 @@ def sales_table():
 
 @app.route('/crazy_books', methods=['POST'])
 def save():
-    # Function implementation remains the same as in your original code
-    pass
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        required = ['title', 'author', 'publisher', 'year_purchased', 'description', 
+                           'secondary_title', 'version', 'available', 'rating', 'price']
+        
+        for r in required:
+            if r not in data:
+                return jsonify({"error": f"Missing required field: {r}"}), 400
+
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                '''
+                INSERT INTO Books (title, author, publisher, year_purchased, year_published, description, 
+                                secondary_title, version,, avaiable, rating, 
+                                review, price)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', 
+                (data['title'], data['author'], data['publisher'], data['year_purchased'],
+                data['year_published'], data['description'], data['secondary_title'], data['version'], 
+                int(data['available']), int(data['rating']), 
+                data.get('review'), float(data['price']))
+            )
+            conn.commit()
+
+        return jsonify({"message": "Book submitted successfully"}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
 @app.route('/crazy_user', methods=['POST'])
 def save_user():
