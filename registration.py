@@ -24,7 +24,7 @@ email = st.text_input('Enter email: ', value=f"{first_name.lower()}{last_name.lo
 password = st.text_input('Create password:', type='password')
 
 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-hashed_password = hashed_password.decode('utf-8')
+# hashed_password = hashed_password.decode('utf-8')
 
 def checkEmail():
     hasAt = '@' in email
