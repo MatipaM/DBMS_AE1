@@ -377,6 +377,7 @@ def return_book():
         cursor.execute('SELECT id FROM Books WHERE title = ?', (title,))
         book_id_result = cursor.fetchone()
         if not book_id_result:
+            print(f"Book not found for title: {title}")
             return jsonify({'error': 'Book not found'}), 404
         book_id = book_id_result[0]
 
@@ -387,6 +388,8 @@ def return_book():
         ''', (returned_date, email, book_id))
 
         if cursor.rowcount == 0:
+            print(f"No matching borrowed book found or book already returned for email: {email}, book_id: {book_id}")
+            conn.rollback()
             return jsonify({'error': 'No matching borrowed book found or book already returned'}), 404
 
         cursor.execute('''
@@ -396,14 +399,19 @@ def return_book():
         ''', (rating, review, book_id))
 
         conn.commit()
-        cursor.close()
-        conn.close()
-
+        
+        print(f"Book returned successfully for email: {email}, book_id: {book_id}")
         return jsonify({'message': 'Book returned successfully'}), 201
 
+    except sqlite3.Error as e:
+        print(f"Database error: {str(e)}")
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'error': 'Error updating data'}), 500
+        print(f"General error: {str(e)}")
+        return jsonify({'error': 'Error updating data', 'details': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/crazy_sale', methods=['POST'])
 def save_sale():

@@ -47,8 +47,20 @@ if 'disapproval_reasons' in st.session_state:
     for reason in reasons:
         st.write(reason)
 
-if 'approval_message' in st.session_state:
-    st.write(st.session_state.approval_message)
+#if 'approval_message' in st.session_state:
+    #st.write(st.session_state.approval_message)
+
+def email_exists(session_email):
+    conn = sqlite3.connect('database.db')  
+    cursor = conn.cursor()
+    cursor.execute("SELECT email FROM Book_records WHERE email=?", (session_email,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+session_email = st.session_state.get('email', '')
+
+if email_exists(session_email):
 
     st.write("Please choose how you would like to receive your book:")
     choice = st.radio("Choose an option", ["Pick Up", "Posted"])
