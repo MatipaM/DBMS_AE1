@@ -471,6 +471,28 @@ create_sales_table()
 create_user_table()
 create_admin_audit()
 
+try:
+    connect = connection()
+    cursor = connect.cursor()
+    query = f'''INSERT INTO Sales (BookID, SalesID, Year_Purchased, Price, date)
+    VALUES 
+    (1, 1, '2023', 15, NULL),
+    (3, 2, '2023', 12, NULL),
+    (5, 3, '2023', 10, NULL);'''
+    query2 = f''' INSERT INTO Books (title, author, publisher, year_purchased, year_published, description, secondary_title, version, available, rating, review, price)
+VALUES 
+    ('The Great Gatsby', 'F. Scott Fitzgerald', 'Charles Scribners Sons', '2023', '1925', 'A novel set in the Jazz Age that tells the story of Jay Gatsby.', 'Gatsby', '1st', 5, 5, 'A timeless classic.', 15),
+    ('To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', '2023', '1960', 'A novel about the serious issues of rape and racial inequality.', 'Mockingbird', '1st', 3, 4, 'A profound and moving book.', 18),
+    ('1984', 'George Orwell', 'Secker & Warburg', '2023', '1949', 'A dystopian novel set in a totalitarian society ruled by Big Brother.', 'Nineteen Eighty-Four', '1st', 7, 5, 'Chilling and thought-provoking.', 12),
+    ('Moby Dick', 'Herman Melville', 'Harper & Brothers', '2023', '1851', 'The saga of Captain Ahab and his relentless pursuit of Moby Dick, the great white whale.', 'Moby-Dick', '1st', 4, 4, 'An epic tale of obsession.', 20),
+    ('Pride and Prejudice', 'Jane Austen', 'T. Egerton, Whitehall', '2023', '1813', 'A romantic novel that also critiques the British landed gentry at the end of the 18th century.', 'Pride & Prejudice', '1st', 2, 5, 'Witty and engaging.', 10);'''
+    cursor.execute(query)
+    cursor.close()
+    connect.close()
+except sqlite3.Error as e:
+    print(e)
+
+
 if __name__ == '__main__':
     create_books()  # Call create_books() only if running this script directly
     #sales_table()   # Call sales_table() only if running this script directly

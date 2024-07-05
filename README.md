@@ -1,51 +1,32 @@
-# DBMS_AE1
+README 
+To run Application:
+Ensure streamlit is installed on your machine: 
+pip install streamlit 
+Documentation: https://docs.streamlit.io/get-started/installation
+Then run: 
+1.	streamlit run server.py
+2.	streamlit run registration.py.
+Program Names 
+1. Server:
+  Usage: Create and save information to database
+2. Registration: 
+  Usage:  enables users to register for new accounts.
+3. Login 
+  Usage: authenticate users to enable access to personalised dashboards
+4. Add Book: 
+  Usage: Librarians can add books to the database
+5. Home 
+  Usage: Provides options to return or request books or view books for sale
+6. Lib Review 
+  Usage: Librarian can approve/disapprove students book requests
+7. Manage Users
+  Usage: Administrators can approve or disapprove newly registered administrators. Administrator can change which pages different users has access to.
+8. Payment 
+  Usage: User pay for books settle outstanding bills.
+9. Request Book 
+  Usage: Users can request access to selected books.
+10. Return Book 
+  Usage: Users can return books that have been borrowed.
+11. User Sales 
+  Usage: Users can purchase selected books.
 
-# Library Management System
-
-##Overview
-
-This library administration system is made to manage the several aspects of running a library, such as keeping track of patron information, book data, and loan activities. The system can accommodate four separate user categories, each with unique features and attributes: staff, librarians, students, and administrators.
-
-## Components
-
-### 1. User Management
-
-- **Entities**: User, Staff, Librarian, Student, Administrator
-- **Attributes**:
-  - User: password, email_address, first_name, last_name, phone_number, address, profile_picture
-  - Staff: id, email_address (FK to User)
-  - Librarian: id, email_address (FK to User)
-  - Student: id, email_address (FK to User)
-  - Administrator: id, email_address (FK to User)
-
-### 2. Book Management
-
-- **Entities**: Book
-- **Attributes**: year_purchased, for_sale, price, author, version, title, secondary_title, publisher, description, available
-
-### 3. Borrowing Management
-
-- **Entities**: Borrows
-- **Attributes**: user_email (FK to User), book_title (FK to Book), borrow_date, return_date, condition
-
-## Normalization
-
-Third Normal Form (3NF) normalisation is applied to the database to guarantee data integrity and prevent redundancy. Table relationships are preserved by using primary keys and foreign keys.
-
-## Physical Design
-
-Indexes are created on frequently searched fields to improve performance:
-- Index on `email_address` in the User table.
-- Index on `title` in the Book table.
-- Composite index on `user_email` and `book_title` in the Borrows table.
-
-## How to Use
-
-### Prerequisites
-
-- MySQL or any other relational database management system
-- Python 3.x (for running scripts, if any)
-
-### Setup
-
-1. https://github.com/MatipaM/DBMS_AE1/compare/main...Bilal-Idris-patch-1?quick_pull=1
